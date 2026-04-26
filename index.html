@@ -2,154 +2,130 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SentiWound</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SentiWound BLE</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:system-ui; background:linear-gradient(135deg,#1a1a2e,#16213e); color:#fff; padding:12px; min-height:100vh; }
-        .c { max-width:380px; margin:0 auto; }
-        h1 { text-align:center; font-size:18px; margin-bottom:12px; }
-        .s { border-radius:14px; padding:18px; text-align:center; margin-bottom:12px; transition: background 0.3s; }
-        .e { font-size:36px; }
-        .t { font-size:20px; font-weight:700; }
-        .r { font-size:32px; font-weight:700; }
-        .m,.u { background:rgba(255,255,255,.1); border-radius:8px; padding:8px; text-align:center; margin-bottom:10px; font-size:13px; }
-        .u { background:rgba(138,43,226,.3); }
-        .g { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
-        .b { background:rgba(255,255,255,.15); border:none; border-radius:10px; padding:12px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; }
-        .b:active { transform:scale(.95); }
-        .b:disabled { opacity:0.5; }
-        .p { background:#4CAF50; }
-        .d { background:#F44336; }
-        .conn { background:#2196F3; grid-column: span 2; font-size:16px; padding:16px; }
-        .mt { background:rgba(255,255,255,.1); border-radius:10px; padding:10px; font-size:13px; }
-        .mr { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.1); }
-        .mr:last-child { border:none; }
-        .ml { opacity:.7; }
-        .step { background:#FF9800; color:#000; border-radius:8px; padding:12px; text-align:center; margin-bottom:10px; font-size:14px; font-weight:700; }
-        .cd { background:rgba(255,152,0,.3); border-radius:8px; padding:8px; text-align:center; margin-bottom:10px; font-size:20px; font-weight:700; }
-        .hidden { display:none; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:system-ui;background:#1a1a2e;color:#fff;padding:15px;min-height:100vh}
+        .c{max-width:400px;margin:0 auto}
+        h1{text-align:center;margin-bottom:15px}
+        .s{border-radius:14px;padding:20px;text-align:center;margin-bottom:12px;background:#9C27B0}
+        .e{font-size:40px}.t{font-size:22px;font-weight:700}.r{font-size:36px;font-weight:700}
+        .m{background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px}
+        .bac{background:#F44336;border-radius:8px;padding:12px;text-align:center;margin-bottom:10px;font-weight:700;display:none}
+        .bac.show{display:block;animation:pulse 1s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+        .step{background:#FF9800;color:#000;border-radius:8px;padding:12px;text-align:center;margin-bottom:10px;font-weight:700;display:none}
+        .cd{background:rgba(255,152,0,.3);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px;font-size:22px;font-weight:700;display:none}
+        .g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+        button{background:rgba(255,255,255,.15);border:none;border-radius:10px;padding:14px;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+        button:disabled{opacity:0.4}
+        .conn{background:#2196F3;grid-column:span 2;font-size:16px}
+        .p{background:#4CAF50}.d{background:#F44336}
+        .mt{background:rgba(255,255,255,.1);border-radius:10px;padding:12px;font-size:13px}
+        .mr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+        .mr:last-child{border:none}.ml{opacity:.6}
     </style>
 </head>
 <body>
 <div class="c">
     <h1>🩹 SentiWound</h1>
     
-    <div class="s" id="status-box" style="background:#9C27B0">
+    <div class="s" id="sbox">
         <div class="e" id="icon">🟣</div>
         <div class="t" id="status">READY</div>
-        <div class="r" id="score">0</div>
+        <div class="r"><span id="score">0</span></div>
         <small>Risk Score</small>
     </div>
     
-    <div class="m" id="msg">Connect to device</div>
+    <div class="bac" id="bacbox">🦠 <span id="bacteria">Unknown</span> Detected!</div>
     
-    <div class="step hidden" id="step-box">📍 <span id="step"></span></div>
-    <div class="cd hidden" id="countdown-box">Reading in <span id="countdown">5</span>s...</div>
-    
-    <div class="u" id="info">UV: ⚫ OFF | Mode: IDLE</div>
+    <div class="m" id="msg">Tap Connect to start</div>
+    <div class="step" id="stepbox">📍 <span id="step"></span></div>
+    <div class="cd" id="cdbox">Reading in <span id="cd">5</span>s...</div>
     
     <div class="g">
-        <button class="b conn" id="connect-btn" onclick="connect()">🔗 Connect to SentiWound</button>
-        <button class="b" onclick="send('calibrate')" disabled id="btn-cal">🎯 Calibrate</button>
-        <button class="b" onclick="send('single')" disabled id="btn-single">📷 Single</button>
-        <button class="b" onclick="send('quick_demo')" disabled id="btn-quick">🎬 Quick Demo</button>
-        <button class="b" onclick="send('extended_demo')" disabled id="btn-ext">🎭 Full Demo</button>
-        <button class="b p" onclick="send('start')" disabled id="btn-start">▶️ Monitor</button>
-        <button class="b d" onclick="send('stop')" disabled id="btn-stop">⏹️ Stop</button>
+        <button class="conn" id="connbtn">🔗 Connect</button>
+        <button onclick="cmd('calibrate')" disabled>🎯 Calibrate</button>
+        <button onclick="cmd('single')" disabled>📷 Single</button>
+        <button onclick="cmd('quick_demo')" disabled>🎬 Quick Demo</button>
+        <button onclick="cmd('extended_demo')" disabled>🎭 Full Demo</button>
+        <button class="p" onclick="cmd('start')" disabled>▶️ Monitor</button>
+        <button class="d" onclick="cmd('stop')" disabled>⏹️ Stop</button>
     </div>
     
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">1.00x</span></div>
-        <div class="mr"><span class="ml">Clear</span><span id="clear">0</span></div>
-        <div class="mr"><span class="ml">Baseline</span><span id="baseline">2700</span></div>
+        <div class="mr"><span class="ml">UV OFF</span><span id="uvoff">0</span></div>
+        <div class="mr"><span class="ml">UV ON</span><span id="uvon">0</span></div>
         <div class="mr"><span class="ml">Temp</span><span id="temp">N/A</span></div>
-        <div class="mr"><span class="ml">Readings</span><span id="count">#0</span></div>
+        <div class="mr"><span class="ml">Mode</span><span id="mode">IDLE</span></div>
     </div>
 </div>
 
 <script>
-const SERVICE_UUID = '12345678-1234-5678-1234-56789abcdef0';
-const CMD_UUID = '12345678-1234-5678-1234-56789abcdef1';
-const DATA_UUID = '12345678-1234-5678-1234-56789abcdef2';
+const SVC='12345678-1234-5678-1234-56789abcdef0';
+const CMD='12345678-1234-5678-1234-56789abcdef1';
+const DAT='12345678-1234-5678-1234-56789abcdef2';
+const col={HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9C27B0',INVALID:'#607D8B'};
+const ico={HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'🟣',INVALID:'❌'};
 
-let device, cmdChar, dataChar;
+let cmdC;
 
-const colors = {HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9C27B0',INVALID:'#607D8B'};
-const icons = {HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'🟣',INVALID:'❌'};
-
-async function connect() {
-    try {
-        document.getElementById('connect-btn').textContent = '🔄 Connecting...';
-        
-        device = await navigator.bluetooth.requestDevice({
-            filters: [{ name: 'SentiWound' }],
-            optionalServices: [SERVICE_UUID]
+document.getElementById('connbtn').onclick=async()=>{
+    try{
+        document.getElementById('connbtn').textContent='Connecting...';
+        const dev=await navigator.bluetooth.requestDevice({filters:[{name:'SentiWound'}],optionalServices:[SVC]});
+        const srv=await dev.gatt.connect();
+        const svc=await srv.getPrimaryService(SVC);
+        cmdC=await svc.getCharacteristic(CMD);
+        const datC=await svc.getCharacteristic(DAT);
+        await datC.startNotifications();
+        datC.addEventListener('characteristicvaluechanged',e=>{
+            const d=JSON.parse(new TextDecoder().decode(e.target.value));
+            
+            // Status display
+            document.getElementById('status').textContent=d.status;
+            document.getElementById('score').textContent=Math.round(d.score);
+            document.getElementById('icon').textContent=ico[d.status]||'❓';
+            document.getElementById('sbox').style.background=col[d.status]||'#9E9E9E';
+            
+            // Message and mode
+            document.getElementById('msg').textContent=d.msg;
+            document.getElementById('mode').textContent=d.mode;
+            
+            // Readings
+            document.getElementById('ratio').textContent=d.ratio.toFixed(2)+'x';
+            document.getElementById('uvoff').textContent=d.clear_off||0;
+            document.getElementById('uvon').textContent=d.clear||0;
+            document.getElementById('temp').textContent=d.temp?d.temp.toFixed(1)+'°C':'N/A';
+            
+            // Bacteria detection
+            const bacBox=document.getElementById('bacbox');
+            if(d.bacteria && d.bacteria!='None'){
+                document.getElementById('bacteria').textContent=d.bacteria;
+                bacBox.classList.add('show');
+            }else{
+                bacBox.classList.remove('show');
+            }
+            
+            // Step display
+            document.getElementById('stepbox').style.display=d.step?'block':'none';
+            document.getElementById('step').textContent=d.step;
+            document.getElementById('cdbox').style.display=d.countdown>0?'block':'none';
+            document.getElementById('cd').textContent=d.countdown;
         });
-        
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService(SERVICE_UUID);
-        
-        cmdChar = await service.getCharacteristic(CMD_UUID);
-        dataChar = await service.getCharacteristic(DATA_UUID);
-        
-        await dataChar.startNotifications();
-        dataChar.addEventListener('characteristicvaluechanged', handleData);
-        
-        document.getElementById('connect-btn').textContent = '✓ Connected';
-        document.getElementById('connect-btn').style.background = '#4CAF50';
-        document.getElementById('msg').textContent = 'Connected! Tap a button.';
-        
-        // Enable buttons
-        document.querySelectorAll('.b').forEach(b => b.disabled = false);
-        
-    } catch (err) {
-        console.error(err);
-        document.getElementById('connect-btn').textContent = '🔗 Connect to SentiWound';
-        document.getElementById('msg').textContent = 'Connection failed. Try again.';
+        document.getElementById('connbtn').textContent='✓ Connected';
+        document.getElementById('connbtn').style.background='#4CAF50';
+        document.getElementById('msg').textContent='Connected! Tap a button.';
+        document.querySelectorAll('button').forEach(b=>b.disabled=false);
+    }catch(e){
+        document.getElementById('connbtn').textContent='🔗 Connect';
+        document.getElementById('msg').textContent='Failed: '+e.message;
     }
-}
+};
 
-async function send(cmd) {
-    if (cmdChar) {
-        await cmdChar.writeValue(new TextEncoder().encode(cmd));
-    }
-}
-
-function handleData(event) {
-    const data = JSON.parse(new TextDecoder().decode(event.target.value));
-    
-    document.getElementById('status').textContent = data.status;
-    document.getElementById('score').textContent = Math.round(data.score);
-    document.getElementById('icon').textContent = icons[data.status] || '❓';
-    document.getElementById('status-box').style.background = colors[data.status] || '#9E9E9E';
-    
-    document.getElementById('msg').textContent = data.msg;
-    document.getElementById('ratio').textContent = data.ratio.toFixed(2) + 'x';
-    document.getElementById('clear').textContent = data.clear;
-    document.getElementById('baseline').textContent = data.baseline;
-    document.getElementById('temp').textContent = data.temp ? data.temp.toFixed(1) + '°C' : 'N/A';
-    document.getElementById('count').textContent = '#' + data.count;
-    document.getElementById('info').textContent = `UV: ${data.uv === 'ON' ? '🔦 ON' : '⚫ OFF'} | Mode: ${data.mode}`;
-    
-    // Step display
-    const stepBox = document.getElementById('step-box');
-    const cdBox = document.getElementById('countdown-box');
-    
-    if (data.step) {
-        document.getElementById('step').textContent = data.step;
-        stepBox.classList.remove('hidden');
-    } else {
-        stepBox.classList.add('hidden');
-    }
-    
-    if (data.countdown > 0) {
-        document.getElementById('countdown').textContent = data.countdown;
-        cdBox.classList.remove('hidden');
-    } else {
-        cdBox.classList.add('hidden');
-    }
-}
+async function cmd(c){if(cmdC)await cmdC.writeValue(new TextEncoder().encode(c));}
 </script>
 </body>
 </html>
