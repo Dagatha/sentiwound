@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SentiWound</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:system-ui; background:linear-gradient(135deg,#1a1a2e,#16213e); color:#fff; padding:12px; min-height:100vh; }
+        .c { max-width:380px; margin:0 auto; }
+        h1 { text-align:center; font-size:18px; margin-bottom:12px; }
+        .s { border-radius:14px; padding:18px; text-align:center; margin-bottom:12px; transition: background 0.3s; }
+        .e { font-size:36px; }
+        .t { font-size:20px; font-weight:700; }
+        .r { font-size:32px; font-weight:700; }
+        .m,.u { background:rgba(255,255,255,.1); border-radius:8px; padding:8px; text-align:center; margin-bottom:10px; font-size:13px; }
+        .u { background:rgba(138,43,226,.3); }
+        .g { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+        .b { background:rgba(255,255,255,.15); border:none; border-radius:10px; padding:12px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; }
+        .b:active { transform:scale(.95); }
+        .b:disabled { opacity:0.5; }
+        .p { background:#4CAF50; }
+        .d { background:#F44336; }
+        .conn { background:#2196F3; grid-column: span 2; font-size:16px; padding:16px; }
+        .mt { background:rgba(255,255,255,.1); border-radius:10px; padding:10px; font-size:13px; }
+        .mr { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.1); }
+        .mr:last-child { border:none; }
+        .ml { opacity:.7; }
+        .step { background:#FF9800; color:#000; border-radius:8px; padding:12px; text-align:center; margin-bottom:10px; font-size:14px; font-weight:700; }
+        .cd { background:rgba(255,152,0,.3); border-radius:8px; padding:8px; text-align:center; margin-bottom:10px; font-size:20px; font-weight:700; }
+        .hidden { display:none; }
+    </style>
+</head>
+<body>
+<div class="c">
+    <h1>🩹 SentiWound</h1>
+    
+    <div class="s" id="status-box" style="background:#9C27B0">
+        <div class="e" id="icon">🟣</div>
+        <div class="t" id="status">READY</div>
+        <div class="r" id="score">0</div>
+        <small>Risk Score</small>
+    </div>
+    
+    <div class="m" id="msg">Connect to device</div>
+    
+    <div class="step hidden" id="step-box">📍 <span id="step"></span></div>
+    <div class="cd hidden" id="countdown-box">Reading in <span id="countdown">5</span>s...</div>
+    
+    <div class="u" id="info">UV: ⚫ OFF | Mode: IDLE</div>
+    
+    <div class="g">
+        <button class="b conn" id="connect-btn" onclick="connect()">🔗 Connect to SentiWound</button>
+        <button class="b" onclick="send('calibrate')" disabled id="btn-cal">🎯 Calibrate</button>
+        <button class="b" onclick="send('single')" disabled id="btn-single">📷 Single</button>
+        <button class="b" onclick="send('quick_demo')" disabled id="btn-quick">🎬 Quick Demo</button>
+        <button class="b" onclick="send('extended_demo')" disabled id="btn-ext">🎭 Full Demo</button>
+        <button class="b p" onclick="send('start')" disabled id="btn-start">▶️ Monitor</button>
+        <button class="b d" onclick="send('stop')" disabled id="btn-stop">⏹️ Stop</button>
+    </div>
+    
+    <div class="mt">
+        <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">1.00x</span></div>
+        <div class="mr"><span class="ml">Clear</span><span id="clear">0</span></div>
+        <div class="mr"><span class="ml">Baseline</span><span id="baseline">2700</span></div>
+        <div class="mr"><span class="ml">Temp</span><span id="temp">N/A</span></div>
+        <div class="mr"><span class="ml">Readings</span><span id="count">#0</span></div>
+    </div>
+</div>
+
+<script>
+const SERVICE_UUID = '12345678-1234-5678-1234-56789abcdef0';
+const CMD_UUID = '12345678-1234-5678-1234-56789abcdef1';
+const DATA_UUID = '12345678-1234-5678-1234-56789abcdef2';
+
+let device, cmdChar, dataChar;
+
+const colors = {HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9C27B0',INVALID:'#607D8B'};
+const icons = {HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'🟣',INVALID:'❌'};
+
+async function connect() {
+    try {
+        document.getElementById('connect-btn').textContent = '🔄 Connecting...';
+        
+        device = await navigator.bluetooth.requestDevice({
+            filters: [{ name: 'SentiWound' }],
+            optionalServices: [SERVICE_UUID]
+        });
+        
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        
+        cmdChar = await service.getCharacteristic(CMD_UUID);
+        dataChar = await service.getCharacteristic(DATA_UUID);
+        
+        await dataChar.startNotifications();
+        dataChar.addEventListener('characteristicvaluechanged', handleData);
+        
+        document.getElementById('connect-btn').textContent = '✓ Connected';
+        document.getElementById('connect-btn').style.background = '#4CAF50';
+        document.getElementById('msg').textContent = 'Connected! Tap a button.';
+        
+        // Enable buttons
+        document.querySelectorAll('.b').forEach(b => b.disabled = false);
+        
+    } catch (err) {
+        console.error(err);
+        document.getElementById('connect-btn').textContent = '🔗 Connect to SentiWound';
+        document.getElementById('msg').textContent = 'Connection failed. Try again.';
+    }
+}
+
+async function send(cmd) {
+    if (cmdChar) {
+        await cmdChar.writeValue(new TextEncoder().encode(cmd));
+    }
+}
+
+function handleData(event) {
+    const data = JSON.parse(new TextDecoder().decode(event.target.value));
+    
+    document.getElementById('status').textContent = data.status;
+    document.getElementById('score').textContent = Math.round(data.score);
+    document.getElementById('icon').textContent = icons[data.status] || '❓';
+    document.getElementById('status-box').style.background = colors[data.status] || '#9E9E9E';
+    
+    document.getElementById('msg').textContent = data.msg;
+    document.getElementById('ratio').textContent = data.ratio.toFixed(2) + 'x';
+    document.getElementById('clear').textContent = data.clear;
+    document.getElementById('baseline').textContent = data.baseline;
+    document.getElementById('temp').textContent = data.temp ? data.temp.toFixed(1) + '°C' : 'N/A';
+    document.getElementById('count').textContent = '#' + data.count;
+    document.getElementById('info').textContent = `UV: ${data.uv === 'ON' ? '🔦 ON' : '⚫ OFF'} | Mode: ${data.mode}`;
+    
+    // Step display
+    const stepBox = document.getElementById('step-box');
+    const cdBox = document.getElementById('countdown-box');
+    
+    if (data.step) {
+        document.getElementById('step').textContent = data.step;
+        stepBox.classList.remove('hidden');
+    } else {
+        stepBox.classList.add('hidden');
+    }
+    
+    if (data.countdown > 0) {
+        document.getElementById('countdown').textContent = data.countdown;
+        cdBox.classList.remove('hidden');
+    } else {
+        cdBox.classList.add('hidden');
+    }
+}
+</script>
+</body>
+</html>
