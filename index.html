@@ -15,6 +15,14 @@
         .bac{background:#F44336;border-radius:8px;padding:12px;text-align:center;margin-bottom:10px;font-weight:700;display:none}
         .bac.show{display:block;animation:pulse 1s infinite}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+        .trend{background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px;display:none}
+        .trend.show{display:block}
+        .trend.improving{background:rgba(76,175,80,.3)}
+        .trend.worsening{background:rgba(244,67,54,.3)}
+        .trend.stable{background:rgba(33,150,243,.3)}
+        .conf{background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center;margin-bottom:10px;font-size:12px}
+        .conf-bar{height:6px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:5px;overflow:hidden}
+        .conf-fill{height:100%;background:#4CAF50;border-radius:3px;transition:width 0.3s}
         .step{background:#FF9800;color:#000;border-radius:8px;padding:12px;text-align:center;margin-bottom:10px;font-weight:700;display:none}
         .cd{background:rgba(255,152,0,.3);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px;font-size:22px;font-weight:700;display:none}
         .g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
@@ -25,12 +33,16 @@
         .mt{background:rgba(255,255,255,.1);border-radius:10px;padding:12px;font-size:13px}
         .mr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1)}
         .mr:last-child{border:none}.ml{opacity:.6}
+        .rec{background:rgba(255,193,7,.2);border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;display:none}
+        .rec.show{display:block}
+        .rec-title{font-weight:700;margin-bottom:5px}
     </style>
 </head>
 <body>
 <div class="c">
     <h1>🩹 SentiWound</h1>
     
+    <!-- Status Card -->
     <div class="s" id="sbox">
         <div class="e" id="icon">🟣</div>
         <div class="t" id="status">READY</div>
@@ -38,12 +50,37 @@
         <small>Risk Score</small>
     </div>
     
-    <div class="bac" id="bacbox">🦠 <span id="bacteria">Unknown</span> Detected!</div>
+    <!-- Bacteria Detection -->
+    <div class="bac" id="bacbox">
+        <span id="baccolor">🦠</span> <span id="bacteria">Unknown</span> Detected!
+        <div style="font-size:12px;margin-top:5px;opacity:0.9">Confidence: <span id="bacconf">0</span>%</div>
+    </div>
     
+    <!-- Trend Analysis -->
+    <div class="trend" id="trendbox">
+        <span id="trendarrow">➖</span> <span id="trendmsg">Analyzing...</span>
+    </div>
+    
+    <!-- Recommendation -->
+    <div class="rec" id="recbox">
+        <div class="rec-title">💡 Recommendation</div>
+        <div id="rectext">Continue monitoring</div>
+    </div>
+    
+    <!-- Message -->
     <div class="m" id="msg">Tap Connect to start</div>
+    
+    <!-- Confidence Bar -->
+    <div class="conf" id="confbox">
+        Reading Confidence: <span id="conflevel">--</span>
+        <div class="conf-bar"><div class="conf-fill" id="confbar" style="width:0%"></div></div>
+    </div>
+    
+    <!-- Step/Countdown -->
     <div class="step" id="stepbox">📍 <span id="step"></span></div>
     <div class="cd" id="cdbox">Reading in <span id="cd">5</span>s...</div>
     
+    <!-- Buttons -->
     <div class="g">
         <button class="conn" id="connbtn">🔗 Connect</button>
         <button onclick="cmd('calibrate')" disabled>🎯 Calibrate</button>
@@ -54,12 +91,18 @@
         <button class="d" onclick="cmd('stop')" disabled>⏹️ Stop</button>
     </div>
     
+    <!-- Metrics -->
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">1.00x</span></div>
         <div class="mr"><span class="ml">UV OFF</span><span id="uvoff">0</span></div>
         <div class="mr"><span class="ml">UV ON</span><span id="uvon">0</span></div>
         <div class="mr"><span class="ml">Temp</span><span id="temp">N/A</span></div>
-        <div class="mr"><span class="ml">Mode</span><span id="mode">IDLE</span></div>
+        <div class="mr"><span class="ml">Healing Score</span><span id="healing">--</span></div>
+        <div class="mr"><span class="ml">Readings</span><span id="count">#0</span></div>
+    </div>
+    
+    <div style="text-align:center;margin-top:15px;font-size:11px;opacity:0.5">
+        SentiWound v2.8 • UV Fluorescence Detection
     </div>
 </div>
 
@@ -67,65 +110,163 @@
 const SVC='12345678-1234-5678-1234-56789abcdef0';
 const CMD='12345678-1234-5678-1234-56789abcdef1';
 const DAT='12345678-1234-5678-1234-56789abcdef2';
-const col={HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9C27B0',INVALID:'#607D8B'};
-const ico={HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'🟣',INVALID:'❌'};
+
+const col={HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9C27B0',INVALID:'#607D8B',RETRY:'#9E9E9E'};
+const ico={HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'🟣',INVALID:'❌',RETRY:'🔄'};
 
 let cmdC;
+let lastStatus = '';
 
-document.getElementById('connbtn').onclick=async()=>{
-    try{
-        document.getElementById('connbtn').textContent='Connecting...';
-        const dev=await navigator.bluetooth.requestDevice({filters:[{name:'SentiWound'}],optionalServices:[SVC]});
-        const srv=await dev.gatt.connect();
-        const svc=await srv.getPrimaryService(SVC);
-        cmdC=await svc.getCharacteristic(CMD);
-        const datC=await svc.getCharacteristic(DAT);
-        await datC.startNotifications();
-        datC.addEventListener('characteristicvaluechanged',e=>{
-            const d=JSON.parse(new TextDecoder().decode(e.target.value));
-            
-            // Status display
-            document.getElementById('status').textContent=d.status;
-            document.getElementById('score').textContent=Math.round(d.score);
-            document.getElementById('icon').textContent=ico[d.status]||'❓';
-            document.getElementById('sbox').style.background=col[d.status]||'#9E9E9E';
-            
-            // Message and mode
-            document.getElementById('msg').textContent=d.msg;
-            document.getElementById('mode').textContent=d.mode;
-            
-            // Readings
-            document.getElementById('ratio').textContent=d.ratio.toFixed(2)+'x';
-            document.getElementById('uvoff').textContent=d.clear_off||0;
-            document.getElementById('uvon').textContent=d.clear||0;
-            document.getElementById('temp').textContent=d.temp?d.temp.toFixed(1)+'°C':'N/A';
-            
-            // Bacteria detection
-            const bacBox=document.getElementById('bacbox');
-            if(d.bacteria && d.bacteria!='None'){
-                document.getElementById('bacteria').textContent=d.bacteria;
-                bacBox.classList.add('show');
-            }else{
-                bacBox.classList.remove('show');
-            }
-            
-            // Step display
-            document.getElementById('stepbox').style.display=d.step?'block':'none';
-            document.getElementById('step').textContent=d.step;
-            document.getElementById('cdbox').style.display=d.countdown>0?'block':'none';
-            document.getElementById('cd').textContent=d.countdown;
+// Sound alert for ALERT status
+function playAlert() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 800;
+        osc.type = 'square';
+        gain.gain.value = 0.2;
+        
+        osc.start();
+        setTimeout(() => {
+            osc.stop();
+            // Second beep
+            const osc2 = ctx.createOscillator();
+            osc2.connect(gain);
+            osc2.frequency.value = 1000;
+            osc2.type = 'square';
+            osc2.start();
+            setTimeout(() => osc2.stop(), 150);
+        }, 200);
+    } catch(e) {}
+}
+
+// Connect button handler
+document.getElementById('connbtn').onclick = async () => {
+    try {
+        document.getElementById('connbtn').textContent = 'Connecting...';
+        const dev = await navigator.bluetooth.requestDevice({
+            filters: [{name: 'SentiWound'}],
+            optionalServices: [SVC]
         });
-        document.getElementById('connbtn').textContent='✓ Connected';
-        document.getElementById('connbtn').style.background='#4CAF50';
-        document.getElementById('msg').textContent='Connected! Tap a button.';
-        document.querySelectorAll('button').forEach(b=>b.disabled=false);
-    }catch(e){
-        document.getElementById('connbtn').textContent='🔗 Connect';
-        document.getElementById('msg').textContent='Failed: '+e.message;
+        const srv = await dev.gatt.connect();
+        const svc = await srv.getPrimaryService(SVC);
+        cmdC = await svc.getCharacteristic(CMD);
+        const datC = await svc.getCharacteristic(DAT);
+        await datC.startNotifications();
+        
+        datC.addEventListener('characteristicvaluechanged', e => {
+            const d = JSON.parse(new TextDecoder().decode(e.target.value));
+            updateUI(d);
+        });
+        
+        document.getElementById('connbtn').textContent = '✓ Connected';
+        document.getElementById('connbtn').style.background = '#4CAF50';
+        document.getElementById('msg').textContent = 'Connected! Tap a button.';
+        document.querySelectorAll('button').forEach(b => b.disabled = false);
+    } catch(e) {
+        document.getElementById('connbtn').textContent = '🔗 Connect';
+        document.getElementById('msg').textContent = 'Failed: ' + e.message;
     }
 };
 
-async function cmd(c){if(cmdC)await cmdC.writeValue(new TextEncoder().encode(c));}
+function updateUI(d) {
+    // Status display
+    document.getElementById('status').textContent = d.status;
+    document.getElementById('score').textContent = Math.round(d.score);
+    document.getElementById('icon').textContent = ico[d.status] || '❓';
+    document.getElementById('sbox').style.background = col[d.status] || '#9E9E9E';
+    
+    // Play alert sound on new ALERT
+    if (d.status === 'ALERT' && lastStatus !== 'ALERT') {
+        playAlert();
+    }
+    lastStatus = d.status;
+    
+    // Message
+    document.getElementById('msg').textContent = d.msg || '';
+    
+    // Readings
+    document.getElementById('ratio').textContent = (d.ratio || 0).toFixed(2) + 'x';
+    document.getElementById('uvoff').textContent = d.clear_off || 0;
+    document.getElementById('uvon').textContent = d.clear || 0;
+    document.getElementById('temp').textContent = d.temp ? d.temp.toFixed(1) + '°C' : 'N/A';
+    document.getElementById('count').textContent = '#' + (d.count || 0);
+    
+    // Bacteria detection
+    const bacBox = document.getElementById('bacbox');
+    if (d.bacteria && d.bacteria !== 'None') {
+        document.getElementById('bacteria').textContent = d.bacteria;
+        document.getElementById('bacconf').textContent = d.bac_confidence || '?';
+        document.getElementById('baccolor').textContent = d.bac_color || '🦠';
+        bacBox.classList.add('show');
+    } else {
+        bacBox.classList.remove('show');
+    }
+    
+    // Trend analysis
+    const trendBox = document.getElementById('trendbox');
+    if (d.trend && d.trend !== 'INSUFFICIENT') {
+        document.getElementById('trendarrow').textContent = d.trend_arrow || '➖';
+        document.getElementById('trendmsg').textContent = d.trend_msg || '';
+        trendBox.classList.remove('improving', 'worsening', 'stable');
+        trendBox.classList.add('show');
+        if (d.trend === 'IMPROVING') trendBox.classList.add('improving');
+        else if (d.trend === 'WORSENING') trendBox.classList.add('worsening');
+        else if (d.trend === 'STABLE') trendBox.classList.add('stable');
+    } else {
+        trendBox.classList.remove('show');
+    }
+    
+    // Healing score
+    document.getElementById('healing').textContent = d.healing ? d.healing + '%' : '--';
+    
+    // Confidence
+    if (d.confidence !== undefined) {
+        document.getElementById('conflevel').textContent = d.conf_level || 'Unknown';
+        document.getElementById('confbar').style.width = d.confidence + '%';
+        
+        // Color based on confidence
+        const confFill = document.getElementById('confbar');
+        if (d.confidence >= 80) confFill.style.background = '#4CAF50';
+        else if (d.confidence >= 50) confFill.style.background = '#FF9800';
+        else confFill.style.background = '#F44336';
+    }
+    
+    // Recommendation
+    const recBox = document.getElementById('recbox');
+    if (d.recommendation && d.status !== 'READY') {
+        document.getElementById('rectext').textContent = d.recommendation;
+        recBox.classList.add('show');
+    } else {
+        recBox.classList.remove('show');
+    }
+    
+    // Step display
+    const stepBox = document.getElementById('stepbox');
+    const cdBox = document.getElementById('cdbox');
+    
+    if (d.step) {
+        document.getElementById('step').textContent = d.step;
+        stepBox.style.display = 'block';
+    } else {
+        stepBox.style.display = 'none';
+    }
+    
+    if (d.countdown > 0) {
+        document.getElementById('cd').textContent = d.countdown;
+        cdBox.style.display = 'block';
+    } else {
+        cdBox.style.display = 'none';
+    }
+}
+
+async function cmd(c) {
+    if (cmdC) await cmdC.writeValue(new TextEncoder().encode(c));
+}
 </script>
 </body>
 </html>
