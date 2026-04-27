@@ -174,66 +174,69 @@ document.getElementById('connbtn').onclick = async () => {
 };
 
 function updateUI(d) {
-    // Status display
-    document.getElementById('status').textContent = d.status || 'READY';
-    document.getElementById('score').textContent = Math.round(d.score || 0);
-    document.getElementById('icon').textContent = ico[d.status] || '❓';
-    document.getElementById('sbox').style.background = col[d.status] || '#9E9E9E';
+    // Handle both full and short key names
+    const status = d.status || d.s || 'READY';
+    const score = d.score || d.sc || 0;
+    const ratio = d.ratio || d.r || 1.0;
+    const clear = d.clear || d.c || 0;
+    const clear_off = d.clear_off || d.co || 0;
+    const msg = d.msg || d.m || '';
+    const bacteria = d.bacteria || d.b || 'None';
+    const trend = d.trend || d.t || '';
+    const step = d.step || d.st || '';
+    const countdown = d.countdown || d.cd || 0;
+    const confidence = d.confidence || d.cf || 100;
+    const temp = d.temp || d.tp || null;
     
-    // Play Alert
-    if (d.status === 'ALERT' && lastStatus !== 'ALERT') playAlert();
-    lastStatus = d.status;
+    // Status display
+    document.getElementById('status').textContent = status;
+    document.getElementById('score').textContent = Math.round(score);
+    document.getElementById('icon').textContent = ico[status] || '❓';
+    document.getElementById('sbox').style.background = col[status] || '#9E9E9E';
+    
+    // Sound alert
+    if (status === 'ALERT' && lastStatus !== 'ALERT') playAlert();
+    lastStatus = status;
     
     // Message
-    document.getElementById('msg').textContent = d.msg || '';    
+    document.getElementById('msg').textContent = msg;
     
     // Readings
-    document.getElementById('ratio').textContent = (d.ratio || 0).toFixed(2) + 'x';
-    document.getElementById('uvoff').textContent = d.clear_off || 0;
-    document.getElementById('uvon').textContent = d.clear || 0;
-    document.getElementById('temp').textContent = d.temp ? d.temp.toFixed(1) + '°C' : 'N/A';
-   
-    // Bacteria detection
+    document.getElementById('ratio').textContent = ratio.toFixed(2) + 'x';
+    document.getElementById('uvoff').textContent = clear_off;
+    document.getElementById('uvon').textContent = clear;
+    document.getElementById('temp').textContent = temp ? temp.toFixed(1) + '°C' : 'N/A';
+    
+    // Bacteria
     const bacBox = document.getElementById('bacbox');
-    if (d.bacteria && d.bacteria !== 'None') {
-        document.getElementById('bacteria').textContent = d.bacteria;
+    if (bacteria && bacteria !== 'None') {
+        document.getElementById('bacteria').textContent = bacteria;
         bacBox.classList.add('show');
     } else {
         bacBox.classList.remove('show');
     }
     
-    // Trend analysis
+    // Trend
     const trendBox = document.getElementById('trendbox');
-    if (d.trend && d.trend !== 'INSUFFICIENT_DATA' && d.trend !== '') {
+    if (trend && trend !== 'INSUFFICIENT_DATA' && trend !== '') {
         document.getElementById('trendarrow').textContent = 
-            d.trend === 'IMPROVING' ? '📉' : d.trend === 'WORSENING' ? '📈' : '➡️';
-        document.getElementById('trendmsg').textContent = d.trend;
+            trend === 'IMPROVING' ? '📉' : trend === 'WORSENING' ? '📈' : '➡️';
+        document.getElementById('trendmsg').textContent = trend;
         trendBox.classList.add('show');
     } else {
         trendBox.classList.remove('show');
     }
     
-    // Healing score
-    document.getElementById('healing').textContent = d.healing ? d.healing + '%' : '--';
-    
     // Confidence bar
-    document.getElementById('confbar').style.width = (d.confidence || 0) + '%';
+    document.getElementById('confbar').style.width = confidence + '%';
+    document.getElementById('conflevel').textContent = 
+        confidence >= 80 ? 'HIGH' : confidence >= 50 ? 'MEDIUM' : 'LOW';
     
-    // Recommendation
-    const recBox = document.getElementById('recbox');
-    if (d.recommendation && d.status !== 'READY') {
-        document.getElementById('rectext').textContent = d.recommendation;
-        recBox.classList.add('show');
-    } else {
-        recBox.classList.remove('show');
-    }
-    
-
     // Step/countdown
-    document.getElementById('stepbox').style.display = d.step ? 'block' : 'none';
-    document.getElementById('step').textContent = d.step || '';
-    document.getElementById('cdbox').style.display = d.countdown > 0 ? 'block' : 'none';
-    document.getElementById('cd').textContent = d.countdown || 0;
+    document.getElementById('stepbox').style.display = step ? 'block' : 'none';
+    document.getElementById('step').textContent = step;
+    document.getElementById('cdbox').style.display = countdown > 0 ? 'block' : 'none';
+    document.getElementById('cd').textContent = countdown;
 }
 
 async function cmd(c) {
