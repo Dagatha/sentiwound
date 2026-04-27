@@ -2,40 +2,219 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>SentiWound BLE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentiWound</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:system-ui;background:#1a1a2e;color:#fff;padding:15px;min-height:100vh}
-        .c{max-width:400px;margin:0 auto}
-        h1{text-align:center;margin-bottom:15px}
-        .s{border-radius:14px;padding:20px;text-align:center;margin-bottom:12px;background:#9C27B0}
-        .e{font-size:40px}.t{font-size:22px;font-weight:700}.r{font-size:36px;font-weight:700}
-        .m{background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px}
-        .bac{background:#F44336;border-radius:8px;padding:12px;text-align:center;margin-bottom:10px;font-weight:700;display:none}
-        .bac.show{display:block;animation:pulse 1s infinite}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
-        .trend{background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px;display:none}
-        .trend.show{display:block}
-        .trend.improving{background:rgba(76,175,80,.3)}
-        .trend.worsening{background:rgba(244,67,54,.3)}
-        .trend.stable{background:rgba(33,150,243,.3)}
-        .conf{background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center;margin-bottom:10px;font-size:12px}
-        .conf-bar{height:6px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:5px;overflow:hidden}
-        .conf-fill{height:100%;background:#4CAF50;border-radius:3px;transition:width 0.3s}
-        .step{background:#FF9800;color:#000;border-radius:8px;padding:12px;text-align:center;margin-bottom:10px;font-weight:700;display:none}
-        .cd{background:rgba(255,152,0,.3);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px;font-size:22px;font-weight:700;display:none}
-        .g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-        button{background:rgba(255,255,255,.15);border:none;border-radius:10px;padding:14px;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
-        button:disabled{opacity:0.4}
-        .conn{background:#2196F3;grid-column:span 2;font-size:16px}
-        .p{background:#4CAF50}.d{background:#F44336}
-        .mt{background:rgba(255,255,255,.1);border-radius:10px;padding:12px;font-size:13px}
-        .mr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1)}
-        .mr:last-child{border:none}.ml{opacity:.6}
-        .rec{background:rgba(255,193,7,.2);border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;display:none}
-        .rec.show{display:block}
-        .rec-title{font-weight:700;margin-bottom:5px}
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+        }
+        .c { max-width: 420px; margin: 0 auto; }
+        h1 { text-align: center; font-size: 24px; margin: 10px 0 20px; }
+        
+        /* Status Card */
+        .s {
+            background: #9E9E9E;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+        .s .icon { font-size: 50px; }
+        .s .status { font-size: 28px; font-weight: bold; margin: 10px 0; }
+        .s .score { font-size: 48px; font-weight: bold; }
+        .s .score-label { font-size: 12px; opacity: 0.8; }
+        
+        /* Alert Box */
+        .alert-box {
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            display: none;
+            animation: pulse 1.5s infinite;
+        }
+        .alert-box.alert {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            border: 2px solid #ff5252;
+        }
+        .alert-box.concern {
+            background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+            border: 2px solid #ffb74d;
+        }
+        .alert-box.show { display: block; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(0.98); }
+        }
+        
+        /* Message */
+        .msg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            min-height: 44px;
+        }
+        
+        /* Step & Countdown */
+        .step {
+            background: #FF9800;
+            color: #000;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            display: none;
+        }
+        .step.show { display: block; }
+        .countdown {
+            background: rgba(255,152,0,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: bold;
+            display: none;
+        }
+        .countdown.show { display: block; }
+        
+        /* Buttons */
+        .g {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        button {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:active { transform: scale(0.95); }
+        button:disabled { opacity: 0.4; }
+        .conn { background: #2196F3; grid-column: span 2; font-size: 16px; }
+        .conn.connected { background: #4CAF50; }
+        .p { background: #4CAF50; }
+        .d { background: #F44336; }
+        
+        /* ML Section */
+        .ml-section {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .ml-title {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .ml-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+        .ml-buttons button { padding: 12px 8px; font-size: 12px; }
+        .btn-healthy { background: #4CAF50; }
+        .btn-infected { background: #F44336; }
+        .btn-false { background: #FF9800; }
+        
+        /* Metrics */
+        .mt {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .mr {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+        }
+        .mr:last-child { border: none; }
+        .ml { opacity: 0.6; }
+        
+        /* Bacteria Box */
+        .bac-box {
+            background: linear-gradient(135deg, #7b1fa2 0%, #4a148c 100%);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+        .bac-box.show { display: block; }
+        .bac-box .title { font-size: 12px; opacity: 0.8; }
+        .bac-box .name { font-size: 18px; font-weight: bold; margin-top: 5px; }
+        
+        /* Trend Box */
+        .trend-box {
+            background: rgba(33,150,243,0.2);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+        .trend-box.show { display: block; }
+        .trend-box .arrow { font-size: 24px; }
+        .trend-box .text { font-size: 14px; margin-top: 5px; }
+        
+        /* Confidence Bar */
+        .conf-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .conf-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .conf-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .conf-fill {
+            height: 100%;
+            background: #4CAF50;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            opacity: 0.5;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -44,41 +223,23 @@
     
     <!-- Status Card -->
     <div class="s" id="sbox">
-        <div class="e" id="icon">🟣</div>
-        <div class="t" id="status">READY</div>
-        <div class="r"><span id="score">0</span></div>
-        <small>Risk Score</small>
+        <div class="icon" id="icon">❓</div>
+        <div class="status" id="status">READY</div>
+        <div class="score" id="score">0</div>
+        <div class="score-label">Risk Score</div>
     </div>
     
-    <!-- Bacteria Detection -->
-    <div class="bac" id="bacbox">
-        <span id="baccolor">🦠</span> <span id="bacteria">Unknown</span> Detected!
-        <div style="font-size:12px;margin-top:5px;opacity:0.9">Confidence: <span id="bacconf">0</span>%</div>
-    </div>
-    
-    <!-- Trend Analysis -->
-    <div class="trend" id="trendbox">
-        <span id="trendarrow">➖</span> <span id="trendmsg">Analyzing...</span>
-    </div>
-    
-    <!-- Recommendation -->
-    <div class="rec" id="recbox">
-        <div class="rec-title">💡 Recommendation</div>
-        <div id="rectext">Continue monitoring</div>
+    <!-- Alert Box -->
+    <div class="alert-box" id="alertbox">
+        <div id="alertmsg"></div>
     </div>
     
     <!-- Message -->
-    <div class="m" id="msg">Tap Connect to start</div>
+    <div class="msg" id="msg">Connect to start...</div>
     
-    <!-- Confidence Bar -->
-    <div class="conf" id="confbox">
-        Reading Confidence: <span id="conflevel">--</span>
-        <div class="conf-bar"><div class="conf-fill" id="confbar" style="width:0%"></div></div>
-    </div>
-    
-    <!-- Step/Countdown -->
-    <div class="step" id="stepbox">📍 <span id="step"></span></div>
-    <div class="cd" id="cdbox">Reading in <span id="cd">5</span>s...</div>
+    <!-- Step & Countdown -->
+    <div class="step" id="stepbox"></div>
+    <div class="countdown" id="cdbox"></div>
     
     <!-- Buttons -->
     <div class="g">
@@ -90,120 +251,216 @@
         <button class="p" onclick="cmd('start')" disabled>▶️ Monitor</button>
         <button class="d" onclick="cmd('stop')" disabled>⏹️ Stop</button>
     </div>
-
-    <!-- ML Feedback Section -->
-    <div style="margin:10px 0;padding:10px;background:rgba(255,255,255,.1);border-radius:8px">
-        <div style="font-size:12px;margin-bottom:8px;opacity:0.7">Label last reading (trains AI):</div>
-        <div class="g" style="grid-template-columns:1fr 1fr 1fr">
-            <button onclick="cmd('label_healthy')" disabled style="background:#4CAF50">✓ Healthy</button>
-            <button onclick="cmd('label_infected')" disabled style="background:#F44336">✗ Infected</button>
-            <button onclick="cmd('label_false')" disabled style="background:#FF9800">⚠ False</button>
+    
+    <!-- ML Feedback -->
+    <div class="ml-section">
+        <div class="ml-title">🧠 Train AI - Label last reading:</div>
+        <div class="ml-buttons">
+            <button class="btn-healthy" onclick="cmd('label_healthy')" disabled>✓ Healthy</button>
+            <button class="btn-infected" onclick="cmd('label_infected')" disabled>✗ Infected</button>
+            <button class="btn-false" onclick="cmd('label_false')" disabled>⚠ False</button>
         </div>
     </div>
-        
+    
+    <!-- Bacteria Detection -->
+    <div class="bac-box" id="bacbox">
+        <div class="title">🦠 Bacteria Detected</div>
+        <div class="name" id="bacteria">--</div>
+    </div>
+    
+    <!-- Trend -->
+    <div class="trend-box" id="trendbox">
+        <div class="arrow" id="trendarrow">➡️</div>
+        <div class="text" id="trendmsg">Stable</div>
+    </div>
+    
+    <!-- Confidence -->
+    <div class="conf-section">
+        <div class="conf-label">
+            <span>Confidence</span>
+            <span id="conflevel">--</span>
+        </div>
+        <div class="conf-bar">
+            <div class="conf-fill" id="confbar" style="width: 0%"></div>
+        </div>
+    </div>
+    
     <!-- Metrics -->
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">1.00x</span></div>
-        <div class="mr"><span class="ml">UV OFF</span><span id="uvoff">0</span></div>
-        <div class="mr"><span class="ml">UV ON</span><span id="uvon">0</span></div>
-        <div class="mr"><span class="ml">Temp</span><span id="temp">N/A</span></div>
-        <div class="mr"><span class="ml">Healing Score</span><span id="healing">--</span></div>
+        <div class="mr"><span class="ml">UV OFF → ON</span><span><span id="uvoff">0</span> → <span id="uvon">0</span></span></div>
+        <div class="mr"><span class="ml">Temperature</span><span id="temp">--</span></div>
         <div class="mr"><span class="ml">Readings</span><span id="count">#0</span></div>
     </div>
     
-    <div style="text-align:center;margin-top:15px;font-size:11px;opacity:0.5">
-        SentiWound v2.8 • UV Fluorescence Detection
+    <div class="footer">
+        SentiWound v3.3 • Predictive AI + KNN Learning
     </div>
 </div>
 
+<!-- Audio Alert -->
+<audio id="alert" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1sbJisr62gkIFqYGtziqS0u7ipl4N0X19wg6CyurmtoYZ5aV1rfZOqtbi1qJqLfm9hanKJnq2vq6CShXlvaW10ipqmp6KYjoN5cW5ydoiWoKGflo6FfHRwcnmFk5qamZKKgXt2c3R7hpKZmZaQiYF8d3N3fIiTl5WTjYZ/eXZ3fIOQlZSRjIWAend3fIKLkZGPi4WBfHh3eX6Hjo+OjIeDfnp4en6Ei4+OjImEgHx5en2DipCOjYmFgn57e3+EipGQjouHhIB9e36Ch42PjoyJhoOAfn6Bg4uOjoyKh4WCf36AgomNjo2LiIWDgH+AgoiLjIuKiIWDgYCAgoaKi4qJh4WDgoGBg4aJioqIh4WEgoGBg4WIiYmIh4aEg4KCg4WHiIiHhoWEg4KChIaHiIeGhYSEg4ODhYaHh4aFhISEg4OEhYaGhoWFhISDg4OEhYaGhYSEhIODg4SEhYaFhISDg4KCg4SEhYWFhIODgoKCgoOEhIWEg4OCgoGBgoODhISDgoKBgYGBgYKDg4OCgoGAgYGBgYKCg4OCgYGBgIGBgYKCgoKBgYGAgICBgYKCgoGBgYCAgICBgYGCgoGBgIB/f4CAgYGBgYGBgIB/f3+AgIGBgYGAgIB/f3+AgIGBgYCAgIB/f3+AgICBgYCAgIB/fn9/gICAgYCAgH9/f35/f4CAgICAgH9/f35/f4CAgIB/f39/fn5/f4CAgIB/f39+fn5/f4CAf39/f35+fn9/f4B/f39/fn5+f39/f39/f35+fn5+f39/f39/fn5+fn5+f39/f35+fn5+fn5/f39/fn5+fn5+fn9/f35+fn5+fn5+f39/fn5+fn5+fn5/f35+fn5+fn5+fn9/fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+" type="audio/wav">
+</audio>
+
 <script>
-const SVC='12345678-1234-5678-1234-56789abcdef0';
-const CMD='12345678-1234-5678-1234-56789abcdef1';
-const DAT='12345678-1234-5678-1234-56789abcdef2';
-
-const col={HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9C27B0',INVALID:'#607D8B',RETRY:'#9E9E9E'};
-const ico={HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'🟣',INVALID:'❌',RETRY:'🔄'};
-
-let cmdC;
+// State
+let device, cmdChar, dataChar;
 let lastStatus = '';
+let readingCount = 0;
 
-// Sound alert for ALERT status
-function playAlert() {
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = 800;
-        osc.type = 'square';
-        gain.gain.value = 0.2;
-        
-        osc.start();
-        setTimeout(() => {
-            osc.stop();
-            // Second beep
-            const osc2 = ctx.createOscillator();
-            osc2.connect(gain);
-            osc2.frequency.value = 1000;
-            osc2.type = 'square';
-            osc2.start();
-            setTimeout(() => osc2.stop(), 150);
-        }, 200);
-    } catch(e) {}
-}
+// Colors & Icons
+const col = {
+    'HEALTHY': '#4CAF50',
+    'WATCH': '#2196F3', 
+    'CONCERN': '#FF9800',
+    'ALERT': '#F44336',
+    'READY': '#9E9E9E'
+};
+const ico = {
+    'HEALTHY': '💚',
+    'WATCH': '🔵',
+    'CONCERN': '⚠️',
+    'ALERT': '🚨',
+    'READY': '⏳'
+};
 
-// Connect button handler
+// Full status messages
+const fullMessages = {
+    'HEALTHY': 'Wound appears healthy - continue normal care',
+    'WATCH': 'Minor changes detected - monitor closely over next 24 hours',
+    'CONCERN': 'Signs of possible infection - consult doctor within 24 hours',
+    'ALERT': 'Seek medical attention immediately'
+};
+
+// Alert messages
+const alertMessages = {
+    'ALERT': '🚨 ACTIVE INFECTION DETECTED - SEEK MEDICAL ATTENTION IMMEDIATELY',
+    'CONCERN': '⚠️ Signs of infection detected - consult a doctor within 24 hours'
+};
+
+// Connect
 document.getElementById('connbtn').onclick = async () => {
     try {
-        document.getElementById('connbtn').textContent = 'Connecting...';
-        const dev = await navigator.bluetooth.requestDevice({
-            filters: [{name: 'SentiWound'}],
-            optionalServices: [SVC]
+        device = await navigator.bluetooth.requestDevice({
+            filters: [{ name: 'SentiWound' }],
+            optionalServices: ['12345678-1234-5678-1234-56789abcdef0']
         });
-        const srv = await dev.gatt.connect();
-        const svc = await srv.getPrimaryService(SVC);
-        cmdC = await svc.getCharacteristic(CMD);
-        const datC = await svc.getCharacteristic(DAT);
-        await datC.startNotifications();
         
-        datC.addEventListener('characteristicvaluechanged', e => {
-            const d = JSON.parse(new TextDecoder().decode(e.target.value));
-            updateUI(d);
-        });
+        device.addEventListener('gattserverdisconnected', onDisconnect);
+        const server = await device.gatt.connect();
+        const svc = await server.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
+        
+        cmdChar = await svc.getCharacteristic('12345678-1234-5678-1234-56789abcdef1');
+        dataChar = await svc.getCharacteristic('12345678-1234-5678-1234-56789abcdef2');
+        
+        await dataChar.startNotifications();
+        dataChar.addEventListener('characteristicvaluechanged', onData);
         
         document.getElementById('connbtn').textContent = '✓ Connected';
-        document.getElementById('connbtn').style.background = '#4CAF50';
-        document.getElementById('msg').textContent = 'Connected! Tap a button.';
+        document.getElementById('connbtn').classList.add('connected');
         document.querySelectorAll('button').forEach(b => b.disabled = false);
-    } catch(e) {
-        document.getElementById('connbtn').textContent = '🔗 Connect';
-        document.getElementById('msg').textContent = 'Failed: ' + e.message;
+        document.getElementById('msg').textContent = 'Connected! Ready to scan.';
+        
+    } catch (e) {
+        console.error(e);
+        document.getElementById('msg').textContent = 'Connection failed: ' + e.message;
     }
 };
 
+function onDisconnect() {
+    document.getElementById('connbtn').textContent = '🔗 Connect';
+    document.getElementById('connbtn').classList.remove('connected');
+    document.querySelectorAll('button:not(.conn)').forEach(b => b.disabled = true);
+    document.getElementById('msg').textContent = 'Disconnected - tap Connect';
+}
+
+function onData(e) {
+    try {
+        const d = JSON.parse(new TextDecoder().decode(e.target.value));
+        console.log('Data:', d);
+        updateUI(d);
+    } catch (err) {
+        console.error('Parse error:', err);
+    }
+}
+
+async function cmd(c) {
+    if (cmdChar) {
+        try {
+            await cmdChar.writeValue(new TextEncoder().encode(c));
+        } catch (e) {
+            console.error('Cmd error:', e);
+        }
+    }
+}
+
+function playAlert() {
+    try { document.getElementById('alert').play(); } catch(e) {}
+}
+
 function updateUI(d) {
-    console.log('Data:', d);  // Debug - check browser console
-    
-    // Status display
+    // Status card
     document.getElementById('status').textContent = d.status || 'READY';
     document.getElementById('score').textContent = Math.round(d.score || 0);
     document.getElementById('icon').textContent = ico[d.status] || '❓';
     document.getElementById('sbox').style.background = col[d.status] || '#9E9E9E';
     
-    // Sound alert
+    // Alert sound
     if (d.status === 'ALERT' && lastStatus !== 'ALERT') playAlert();
     lastStatus = d.status;
     
-    // Message
-    document.getElementById('msg').textContent = d.msg || '';
+    // Alert box
+    const alertBox = document.getElementById('alertbox');
+    const alertMsg = document.getElementById('alertmsg');
+    if (d.status === 'ALERT') {
+        alertMsg.textContent = alertMessages['ALERT'];
+        alertBox.className = 'alert-box alert show';
+    } else if (d.status === 'CONCERN') {
+        alertMsg.textContent = alertMessages['CONCERN'];
+        alertBox.className = 'alert-box concern show';
+    } else {
+        alertBox.className = 'alert-box';
+    }
     
-    // Readings
+    // Message - use full message or BLE message
+    const msgEl = document.getElementById('msg');
+    if (d.msg && (d.msg.includes('⚠️') || d.msg.includes('🚨') || d.msg.includes('⏰') || d.msg.includes('📈'))) {
+        // Prediction message from BLE
+        msgEl.textContent = d.msg;
+    } else if (fullMessages[d.status] && d.status !== 'READY') {
+        // Full status message
+        msgEl.textContent = fullMessages[d.status];
+    } else if (d.msg) {
+        msgEl.textContent = d.msg;
+    }
+    
+    // Step & Countdown
+    const stepBox = document.getElementById('stepbox');
+    if (d.step && d.step.length > 0) {
+        stepBox.textContent = d.step;
+        stepBox.classList.add('show');
+    } else {
+        stepBox.classList.remove('show');
+    }
+    
+    const cdBox = document.getElementById('cdbox');
+    if (d.countdown && d.countdown > 0) {
+        cdBox.textContent = d.countdown;
+        cdBox.classList.add('show');
+    } else {
+        cdBox.classList.remove('show');
+    }
+    
+    // Metrics
     document.getElementById('ratio').textContent = (d.ratio || 1).toFixed(2) + 'x';
     document.getElementById('uvoff').textContent = d.clear_off || 0;
     document.getElementById('uvon').textContent = d.clear || 0;
-    document.getElementById('temp').textContent = d.temp ? d.temp.toFixed(1) + '°C' : 'N/A';
+    document.getElementById('temp').textContent = d.temp ? d.temp.toFixed(1) + '°C' : '--';
+    
+    // Reading count
+    if (d.clear > 0) readingCount++;
+    document.getElementById('count').textContent = '#' + readingCount;
     
     // Bacteria
     const bacBox = document.getElementById('bacbox');
@@ -216,30 +473,27 @@ function updateUI(d) {
     
     // Trend
     const trendBox = document.getElementById('trendbox');
-    if (d.trend && d.trend !== 'INSUFFICIENT_DATA' && d.trend !== '') {
-        document.getElementById('trendarrow').textContent = 
-            d.trend === 'IMPROVING' ? '📉' : d.trend === 'WORSENING' ? '📈' : '➡️';
-        document.getElementById('trendmsg').textContent = d.trend;
+    if (d.trend && d.trend !== 'INSUFFICIENT' && d.trend !== '') {
+        const arrows = {'IMPROVING': '📉', 'WORSENING': '📈', 'STABLE': '➡️'};
+        const msgs = {'IMPROVING': 'Improving!', 'WORSENING': 'Getting worse', 'STABLE': 'Stable'};
+        document.getElementById('trendarrow').textContent = arrows[d.trend] || '➡️';
+        document.getElementById('trendmsg').textContent = msgs[d.trend] || d.trend;
         trendBox.classList.add('show');
     } else {
         trendBox.classList.remove('show');
     }
     
-    // Confidence bar
+    // Confidence
     const conf = d.confidence || 0;
     document.getElementById('confbar').style.width = conf + '%';
     document.getElementById('conflevel').textContent = 
-        conf >= 80 ? 'HIGH' : conf >= 50 ? 'MEDIUM' : 'LOW';
+        conf >= 75 ? 'HIGH' : conf >= 50 ? 'MEDIUM' : 'LOW';
     
-    // Step/countdown
-    document.getElementById('stepbox').style.display = d.step ? 'block' : 'none';
-    document.getElementById('step').textContent = d.step || '';
-    document.getElementById('cdbox').style.display = (d.countdown > 0) ? 'block' : 'none';
-    document.getElementById('cd').textContent = d.countdown || 0;
-}
-
-async function cmd(c) {
-    if (cmdC) await cmdC.writeValue(new TextEncoder().encode(c));
+    // Color confidence bar based on level
+    const confFill = document.getElementById('confbar');
+    if (conf >= 75) confFill.style.background = '#4CAF50';
+    else if (conf >= 50) confFill.style.background = '#FF9800';
+    else confFill.style.background = '#F44336';
 }
 </script>
 </body>
