@@ -175,33 +175,28 @@ document.getElementById('connbtn').onclick = async () => {
 
 function updateUI(d) {
     // Status display
-    document.getElementById('status').textContent = d.status;
-    document.getElementById('score').textContent = Math.round(d.score);
+    document.getElementById('status').textContent = d.status || 'READY';
+    document.getElementById('score').textContent = Math.round(d.score || 0);
     document.getElementById('icon').textContent = ico[d.status] || '❓';
     document.getElementById('sbox').style.background = col[d.status] || '#9E9E9E';
     
-    // Play alert sound on new ALERT
-    if (d.status === 'ALERT' && lastStatus !== 'ALERT') {
-        playAlert();
-    }
+    // Play Alert
+    if (d.status === 'ALERT' && lastStatus !== 'ALERT') playAlert();
     lastStatus = d.status;
     
     // Message
-    document.getElementById('msg').textContent = d.msg || '';
+    document.getElementById('msg').textContent = d.msg || '';    
     
     // Readings
     document.getElementById('ratio').textContent = (d.ratio || 0).toFixed(2) + 'x';
     document.getElementById('uvoff').textContent = d.clear_off || 0;
     document.getElementById('uvon').textContent = d.clear || 0;
     document.getElementById('temp').textContent = d.temp ? d.temp.toFixed(1) + '°C' : 'N/A';
-    document.getElementById('count').textContent = '#' + (d.count || 0);
-    
+   
     // Bacteria detection
     const bacBox = document.getElementById('bacbox');
     if (d.bacteria && d.bacteria !== 'None') {
         document.getElementById('bacteria').textContent = d.bacteria;
-        document.getElementById('bacconf').textContent = d.bac_confidence || '?';
-        document.getElementById('baccolor').textContent = d.bac_color || '🦠';
         bacBox.classList.add('show');
     } else {
         bacBox.classList.remove('show');
@@ -209,14 +204,11 @@ function updateUI(d) {
     
     // Trend analysis
     const trendBox = document.getElementById('trendbox');
-    if (d.trend && d.trend !== 'INSUFFICIENT') {
-        document.getElementById('trendarrow').textContent = d.trend_arrow || '➖';
-        document.getElementById('trendmsg').textContent = d.trend_msg || '';
-        trendBox.classList.remove('improving', 'worsening', 'stable');
+    if (d.trend && d.trend !== 'INSUFFICIENT_DATA' && d.trend !== '') {
+        document.getElementById('trendarrow').textContent = 
+            d.trend === 'IMPROVING' ? '📉' : d.trend === 'WORSENING' ? '📈' : '➡️';
+        document.getElementById('trendmsg').textContent = d.trend;
         trendBox.classList.add('show');
-        if (d.trend === 'IMPROVING') trendBox.classList.add('improving');
-        else if (d.trend === 'WORSENING') trendBox.classList.add('worsening');
-        else if (d.trend === 'STABLE') trendBox.classList.add('stable');
     } else {
         trendBox.classList.remove('show');
     }
@@ -224,17 +216,8 @@ function updateUI(d) {
     // Healing score
     document.getElementById('healing').textContent = d.healing ? d.healing + '%' : '--';
     
-    // Confidence
-    if (d.confidence !== undefined) {
-        document.getElementById('conflevel').textContent = d.conf_level || 'Unknown';
-        document.getElementById('confbar').style.width = d.confidence + '%';
-        
-        // Color based on confidence
-        const confFill = document.getElementById('confbar');
-        if (d.confidence >= 80) confFill.style.background = '#4CAF50';
-        else if (d.confidence >= 50) confFill.style.background = '#FF9800';
-        else confFill.style.background = '#F44336';
-    }
+    // Confidence bar
+    document.getElementById('confbar').style.width = (d.confidence || 0) + '%';
     
     // Recommendation
     const recBox = document.getElementById('recbox');
@@ -245,23 +228,12 @@ function updateUI(d) {
         recBox.classList.remove('show');
     }
     
-    // Step display
-    const stepBox = document.getElementById('stepbox');
-    const cdBox = document.getElementById('cdbox');
-    
-    if (d.step) {
-        document.getElementById('step').textContent = d.step;
-        stepBox.style.display = 'block';
-    } else {
-        stepBox.style.display = 'none';
-    }
-    
-    if (d.countdown > 0) {
-        document.getElementById('cd').textContent = d.countdown;
-        cdBox.style.display = 'block';
-    } else {
-        cdBox.style.display = 'none';
-    }
+
+    // Step/countdown
+    document.getElementById('stepbox').style.display = d.step ? 'block' : 'none';
+    document.getElementById('step').textContent = d.step || '';
+    document.getElementById('cdbox').style.display = d.countdown > 0 ? 'block' : 'none';
+    document.getElementById('cd').textContent = d.countdown || 0;
 }
 
 async function cmd(c) {
