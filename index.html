@@ -89,11 +89,18 @@
         <button onclick="cmd('extended_demo')" disabled>🎭 Full Demo</button>
         <button class="p" onclick="cmd('start')" disabled>▶️ Monitor</button>
         <button class="d" onclick="cmd('stop')" disabled>⏹️ Stop</button>
-        <button onclick="cmd('calibrate_personal')" disabled>🧬 Personal Cal</button>
-        <button onclick="cmd('feedback_correct')" disabled>👍 Correct</button>
-        <button onclick="cmd('feedback_wrong')" disabled>👎 Wrong</button>
     </div>
-    
+
+    <!-- ML Feedback Section -->
+    <div style="margin:10px 0;padding:10px;background:rgba(255,255,255,.1);border-radius:8px">
+        <div style="font-size:12px;margin-bottom:8px;opacity:0.7">Label last reading (trains AI):</div>
+        <div class="g" style="grid-template-columns:1fr 1fr 1fr">
+            <button onclick="cmd('label_healthy')" disabled style="background:#4CAF50">✓ Healthy</button>
+            <button onclick="cmd('label_infected')" disabled style="background:#F44336">✗ Infected</button>
+            <button onclick="cmd('label_false')" disabled style="background:#FF9800">⚠ False</button>
+        </div>
+    </div>
+        
     <!-- Metrics -->
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">1.00x</span></div>
