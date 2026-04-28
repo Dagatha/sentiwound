@@ -49,6 +49,50 @@
             50% { transform: scale(0.98); opacity: 0.85; }
         }
         
+        /* NEW: Healing Score Card */
+        .healing-card {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .healing-item { text-align: center; }
+        .healing-item .value { font-size: 28px; font-weight: 700; }
+        .healing-item .label { font-size: 10px; opacity: 0.8; }
+        .healing-item.warning .value { color: #ffeb3b; }
+        
+        /* NEW: Stage Indicator */
+        .stage-box {
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            text-align: center;
+            display: none;
+        }
+        .stage-box.show { display: block; }
+        .stage-box.NONE { background: linear-gradient(135deg, #4caf50, #388e3c); }
+        .stage-box.EARLY { background: linear-gradient(135deg, #ffc107, #ffa000); color: #000; }
+        .stage-box.MODERATE { background: linear-gradient(135deg, #ff9800, #f57c00); }
+        .stage-box.SEVERE { background: linear-gradient(135deg, #f44336, #c62828); }
+        .stage-box .stage-title { font-size: 12px; font-weight: 700; }
+        .stage-box .stage-action { font-size: 11px; margin-top: 4px; opacity: 0.9; }
+        
+        /* NEW: Warning Box */
+        .warning-box {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 12px;
+            display: none;
+        }
+        .warning-box.show { display: block; }
+        
         /* Message */
         .msg {
             background: rgba(255,255,255,0.1);
@@ -86,7 +130,7 @@
         }
         .countdown.show { display: flex; }
         
-        /* Button Grid */
+        /* Buttons */
         .btn-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -97,34 +141,25 @@
             background: rgba(255,255,255,0.15);
             border: none;
             border-radius: 10px;
-            padding: 12px;
+            padding: 12px 8px;
             color: #fff;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
         }
-        button:active { transform: scale(0.95); }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-connect { background: #2196F3; grid-column: span 2; font-size: 15px; }
-        .btn-connect.connected { background: #4CAF50; }
+        button:disabled { opacity: 0.4; }
+        .btn-connect { background: #2196F3; grid-column: span 2; font-size: 16px; }
         .btn-start { background: #4CAF50; }
         .btn-stop { background: #F44336; }
-        .btn-full { grid-column: span 2; }
         
-        /* ML Section */
+        /* Section */
         .section {
-            background: rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 10px;
             margin-bottom: 12px;
         }
-        .section-title {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-bottom: 10px;
-            text-align: center;
-        }
+        .section-title { font-size: 11px; opacity: 0.7; margin-bottom: 8px; text-align: center; }
         .btn-grid-3 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -134,14 +169,15 @@
         .btn-infected { background: #F44336; }
         .btn-false { background: #FF9800; }
         .btn-small { padding: 10px 6px; font-size: 11px; }
-        
-        /* Data Section */
         .btn-grid-4 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
             gap: 6px;
         }
         .btn-data { background: #607D8B; font-size: 10px; padding: 8px 4px; }
+        
+        /* NEW: Treatment Buttons */
+        .btn-tx { background: #9c27b0; font-size: 10px; padding: 8px 4px; }
         
         /* Bacteria Box */
         .bacteria-box {
@@ -169,61 +205,38 @@
         .trend-box .arrow { font-size: 22px; }
         .trend-box .text { font-size: 13px; }
         
-        /* Confidence */
-        .conf-section {
-            background: rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 12px;
-        }
-        .conf-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            margin-bottom: 6px;
-        }
-        .conf-bar {
-            height: 6px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .conf-fill {
-            height: 100%;
-            background: #4CAF50;
-            border-radius: 3px;
-            transition: all 0.3s;
-        }
-        
         /* Metrics */
         .metrics {
             background: rgba(255,255,255,0.08);
             border-radius: 10px;
             padding: 10px;
-            margin-bottom: 12px;
+            font-size: 12px;
         }
-        .metric {
+        .metric-row {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 5px 0;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            font-size: 13px;
         }
-        .metric:last-child { border: none; }
+        .metric-row:last-child { border: none; }
         .metric-label { opacity: 0.6; }
         
-        /* Footer */
-        .footer {
-            text-align: center;
-            font-size: 10px;
-            opacity: 0.5;
-            margin-top: 15px;
+        /* Confidence */
+        .conf-section {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
+        .conf-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
+        .conf-bar { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+        .conf-fill { height: 100%; background: #4CAF50; border-radius: 3px; transition: width 0.3s; }
+        
+        .footer { text-align: center; font-size: 10px; opacity: 0.4; margin-top: 15px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>🩹 SentiWound</h1>
+    <h1>🩹 SentiWound v4.0</h1>
     
     <!-- Status Card -->
     <div class="status-card" id="statusCard">
@@ -231,6 +244,29 @@
         <div class="status" id="status">READY</div>
         <div class="score" id="score">0</div>
         <div class="label">Risk Score</div>
+    </div>
+    
+    <!-- NEW: Healing Score Card -->
+    <div class="healing-card">
+        <div class="healing-item">
+            <div class="value" id="healingScore">--</div>
+            <div class="label">💊 HEALING SCORE™</div>
+        </div>
+        <div class="healing-item">
+            <div class="value" id="daysToHeal">--</div>
+            <div class="label">📅 Days to Heal</div>
+        </div>
+    </div>
+    
+    <!-- NEW: Stage Indicator -->
+    <div class="stage-box" id="stageBox">
+        <div class="stage-title" id="stageTitle">NONE</div>
+        <div class="stage-action" id="stageAction">No infection detected</div>
+    </div>
+    
+    <!-- NEW: Warning Box -->
+    <div class="warning-box" id="warningBox">
+        <span id="warningText"></span>
     </div>
     
     <!-- Alert Box -->
@@ -265,14 +301,30 @@
         </div>
     </div>
     
+    <!-- NEW: Treatment Logging -->
+    <div class="section">
+        <div class="section-title">💊 Log Treatment</div>
+        <div class="btn-grid-4">
+            <button class="btn-tx" onclick="cmd('tx_neosporin')" disabled>Neosporin</button>
+            <button class="btn-tx" onclick="cmd('tx_bandage')" disabled>Bandage</button>
+            <button class="btn-tx" onclick="cmd('tx_saline')" disabled>Saline</button>
+            <button class="btn-tx" onclick="cmd('tx_antiseptic')" disabled>Antiseptic</button>
+        </div>
+        <div class="btn-grid-3" style="margin-top:6px">
+            <button class="btn-tx" onclick="cmd('tx_antibiotics')" disabled>💉 Antibiotics</button>
+            <button class="btn-tx" onclick="cmd('tx_report')" disabled>📊 Report</button>
+            <button class="btn-tx" onclick="cmd('tx_clear')" disabled>🗑️ Clear</button>
+        </div>
+    </div>
+    
     <!-- Data Management -->
     <div class="section">
         <div class="section-title">📊 Data Management</div>
         <div class="btn-grid-4">
             <button class="btn-data" onclick="cmd('export')" disabled>📤 Export</button>
-            <button class="btn-data" onclick="cmd('summary')" disabled>📈 Summary</button>
             <button class="btn-data" onclick="cmd('knn_stats')" disabled>🧠 KNN</button>
-            <button class="btn-data" onclick="cmd('clear_all')" disabled>🗑️ Clear</button>
+            <button class="btn-data" onclick="cmd('history_clear')" disabled>📜 Clear</button>
+            <button class="btn-data" onclick="cmd('clear_all')" disabled>🗑️ All</button>
         </div>
     </div>
     
@@ -288,129 +340,79 @@
         <span class="text" id="trendText">Stable</span>
     </div>
     
-    <!-- Confidence -->
-    <div class="conf-section">
-        <div class="conf-header">
-            <span>Confidence</span>
-            <span id="confLevel">--</span>
-        </div>
-        <div class="conf-bar">
-            <div class="conf-fill" id="confBar" style="width:0%"></div>
-        </div>
-    </div>
-    
     <!-- Metrics -->
     <div class="metrics">
-        <div class="metric">
-            <span class="metric-label">Fluorescence</span>
-            <span id="ratio">1.00x</span>
-        </div>
-        <div class="metric">
-            <span class="metric-label">UV OFF → ON</span>
-            <span><span id="uvOff">0</span> → <span id="uvOn">0</span></span>
-        </div>
-        <div class="metric">
-            <span class="metric-label">Temperature</span>
-            <span id="temp">--</span>
-        </div>
-        <div class="metric">
-            <span class="metric-label">Readings</span>
-            <span id="count">#0</span>
+        <div class="metric-row"><span class="metric-label">Fluorescence</span><span id="ratio">1.00x</span></div>
+        <div class="metric-row"><span class="metric-label">UV OFF → ON</span><span id="uvValues">0 → 0</span></div>
+        <div class="metric-row"><span class="metric-label">Temperature</span><span id="temp">--</span></div>
+        <div class="conf-section">
+            <div class="conf-header"><span>Confidence</span><span id="confLevel">--</span></div>
+            <div class="conf-bar"><div class="conf-fill" id="confBar" style="width:0%"></div></div>
         </div>
     </div>
     
-    <div class="footer">SentiWound v3.6 • Optimized</div>
+    <div class="footer">SentiWound v4.0 • Clinical Intelligence Edition</div>
 </div>
 
-<!-- Alert Sound -->
-<audio id="alertSound" preload="auto">
-    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1sbJisr62gkIFqYGtziqS0u7ipl4N0X19wg6CyurmtoYZ5aV1rfZOqtbi1qJqLfm9hanKJnq2vq6CShXlvaW10ipqmp6KYjoN5cW5ydoiWoKGflo6FfHRwcnmFk5qamZKKgXt2c3R7hpKZmZaQiYF8d3N3fIiTl5WTjYZ/eXZ3fIOQlZSRjIWAend3fIKLkZGPi4WBfHh3eX6Hjo+OjIeDfnp4en6Ei4+OjImEgHx5en2DipCOjYmFgn57e3+EipGQjouHhIB9e36Ch42PjoyJhoOAfn6Bg4uOjoyKh4WCf36AgomNjo2LiIWDgH+AgoiLjIuKiIWDgYCAgoaKi4qJh4WDgoGBg4aJioqIh4WEgoGBg4WIiYmIh4aEg4KCg4WHiIiHhoWEg4KChIaHiIeGhYSEg4ODhYaHh4aFhISEg4OEhYaGhoWFhISDg4OEhYaGhYSEhIODg4SEhYaFhIODg4KCg4SEhYWFhIODgoKCgoOEhIWEg4OCgoGBgoODhISDgoKBgYGBgYKDg4OCgoGAgYGBgYKCg4OCgYGBgIGBgYKCgoKBgYGAgICBgYKCgoGBgYCAgICBgYGCgoGBgIB/f4CAgYGBgYGBgIB/f3+AgIGBgYGAgIB/f3+AgIGBgYCAgIB/f3+AgICBgYCAgIB/fn9/gICAgYCAgH9/f35/f4CAgICAgH9/f35/f4CAgIB/f39/fn5/f4CAgIB/f39+fn5/f4CAf39/f35+fn9/f4B/f39/fn5+f39/f39/f35+fn5+f39/f39/fn5+fn5+f39/f35+fn5+fn5/f39/fn5+fn5+fn9/f35+fn5+fn5+f39/fn5+fn5+fn5/f35+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+" type="audio/wav">
-</audio>
-
 <script>
-// State
-let device, cmdChar, dataChar;
-let lastStatus = '';
-let readingCount = 0;
+const icons = { HEALTHY: '💚', WATCH: '🔵', CONCERN: '⚠️', ALERT: '🚨', READY: '⏳' };
+const colors = { HEALTHY: '#4CAF50', WATCH: '#2196F3', CONCERN: '#FF9800', ALERT: '#F44336', READY: '#9E9E9E' };
+const stageIcons = { NONE: '✅', EARLY: '🟡', MODERATE: '🟠', SEVERE: '🔴' };
 
-// Status config
-const colors = {
-    HEALTHY: '#4CAF50', WATCH: '#2196F3',
-    CONCERN: '#FF9800', ALERT: '#F44336', READY: '#9E9E9E'
-};
-const icons = {
-    HEALTHY: '💚', WATCH: '🔵',
-    CONCERN: '⚠️', ALERT: '🚨', READY: '⏳'
-};
-const fullMessages = {
-    HEALTHY: 'Wound appears healthy - continue normal care',
-    WATCH: 'Minor changes detected - monitor closely',
-    CONCERN: 'Signs of possible infection - see doctor within 24 hours',
-    ALERT: 'Seek medical attention immediately'
-};
-const alertMessages = {
-    ALERT: '🚨 ACTIVE INFECTION - SEEK MEDICAL ATTENTION IMMEDIATELY',
-    CONCERN: '⚠️ Signs of infection - consult doctor within 24 hours'
-};
+let device, cmdChar, dataChar, lastStatus = '';
 
-// Connect handler
+// BLE
 document.getElementById('connectBtn').onclick = async () => {
     try {
         device = await navigator.bluetooth.requestDevice({
             filters: [{ name: 'SentiWound' }],
             optionalServices: ['12345678-1234-5678-1234-56789abcdef0']
         });
-        
         device.addEventListener('gattserverdisconnected', onDisconnect);
         const server = await device.gatt.connect();
-        const service = await server.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
-        
-        cmdChar = await service.getCharacteristic('12345678-1234-5678-1234-56789abcdef1');
-        dataChar = await service.getCharacteristic('12345678-1234-5678-1234-56789abcdef2');
-        
+        const svc = await server.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
+        cmdChar = await svc.getCharacteristic('12345678-1234-5678-1234-56789abcdef1');
+        dataChar = await svc.getCharacteristic('12345678-1234-5678-1234-56789abcdef2');
         await dataChar.startNotifications();
         dataChar.addEventListener('characteristicvaluechanged', onData);
-        
-        document.getElementById('connectBtn').textContent = '✓ Connected';
-        document.getElementById('connectBtn').classList.add('connected');
         document.querySelectorAll('button').forEach(b => b.disabled = false);
-        document.getElementById('msg').textContent = 'Connected! Ready to scan.';
-        
+        document.getElementById('connectBtn').textContent = '✅ Connected';
+        document.getElementById('msg').textContent = 'Ready! Choose an action.';
     } catch (e) {
-        console.error(e);
         document.getElementById('msg').textContent = 'Connection failed: ' + e.message;
     }
 };
 
 function onDisconnect() {
+    document.querySelectorAll('button').forEach(b => b.disabled = true);
+    document.getElementById('connectBtn').disabled = false;
     document.getElementById('connectBtn').textContent = '🔗 Connect';
-    document.getElementById('connectBtn').classList.remove('connected');
-    document.querySelectorAll('button:not(#connectBtn)').forEach(b => b.disabled = true);
-    document.getElementById('msg').textContent = 'Disconnected - tap Connect';
+    document.getElementById('msg').textContent = 'Disconnected. Reconnect?';
 }
 
-function onData(event) {
+function onData(e) {
     try {
-        const data = JSON.parse(new TextDecoder().decode(event.target.value));
-        console.log('Data:', data);
-        updateUI(data);
-    } catch (e) {
-        console.error('Parse error:', e);
-    }
+        const d = JSON.parse(new TextDecoder().decode(e.target.value));
+        updateUI(d);
+    } catch (err) {}
 }
 
-async function cmd(command) {
+async function cmd(c) {
     if (cmdChar) {
-        try {
-            await cmdChar.writeValue(new TextEncoder().encode(command));
-        } catch (e) {
-            console.error('Command error:', e);
-        }
+        try { await cmdChar.writeValue(new TextEncoder().encode(c)); }
+        catch (e) { document.getElementById('msg').textContent = 'Send failed'; }
     }
 }
 
 function playAlert() {
-    try { document.getElementById('alertSound').play(); } catch(e) {}
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 880; gain.gain.value = 0.3;
+        osc.start(); osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {}
 }
 
 function updateUI(d) {
@@ -427,24 +429,63 @@ function updateUI(d) {
     // Alert box
     const alertBox = document.getElementById('alertBox');
     if (d.status === 'ALERT') {
-        alertBox.textContent = alertMessages.ALERT;
+        alertBox.textContent = '🚨 ALERT: Seek medical attention immediately!';
         alertBox.className = 'alert-box alert show';
     } else if (d.status === 'CONCERN') {
-        alertBox.textContent = alertMessages.CONCERN;
+        alertBox.textContent = '⚠️ CONCERN: See a doctor within 24 hours';
         alertBox.className = 'alert-box concern show';
     } else {
         alertBox.className = 'alert-box';
     }
     
-    // Message
-    const msgEl = document.getElementById('msg');
-    if (d.msg && (d.msg.includes('⚠️') || d.msg.includes('🚨') || d.msg.includes('📈') || d.msg.includes('✓'))) {
-        msgEl.textContent = d.msg;
-    } else if (fullMessages[d.status] && d.status !== 'READY') {
-        msgEl.textContent = fullMessages[d.status];
-    } else if (d.msg) {
-        msgEl.textContent = d.msg;
+    // NEW: Healing Score
+    const healingEl = document.getElementById('healingScore');
+    if (d.healing !== undefined && d.healing !== null) {
+        healingEl.textContent = d.healing;
+        // Color based on score
+        if (d.healing >= 70) healingEl.style.color = '#4caf50';
+        else if (d.healing >= 40) healingEl.style.color = '#ffeb3b';
+        else healingEl.style.color = '#ff5722';
+    } else {
+        healingEl.textContent = '--';
     }
+    
+    // NEW: Days to Heal
+    const daysEl = document.getElementById('daysToHeal');
+    if (d.days !== undefined) {
+        if (d.days === 0) daysEl.textContent = '✓';
+        else if (d.days === -1) { daysEl.textContent = '📉'; daysEl.parentElement.classList.add('warning'); }
+        else if (d.days === -2) { daysEl.textContent = '⏸️'; daysEl.parentElement.classList.add('warning'); }
+        else { daysEl.textContent = d.days + 'd'; daysEl.parentElement.classList.remove('warning'); }
+    }
+    
+    // NEW: Stage Box
+    const stageBox = document.getElementById('stageBox');
+    if (d.stage && d.stage !== 'NONE') {
+        stageBox.className = 'stage-box show ' + d.stage;
+        document.getElementById('stageTitle').textContent = stageIcons[d.stage] + ' ' + d.stage;
+        // Stage-specific actions
+        const actions = {
+            EARLY: 'Clean wound, apply antiseptic, monitor closely',
+            MODERATE: 'See doctor within 24 hours',
+            SEVERE: 'Seek medical attention immediately'
+        };
+        document.getElementById('stageAction').textContent = actions[d.stage] || '';
+    } else {
+        stageBox.className = 'stage-box';
+    }
+    
+    // NEW: Warning Box
+    const warningBox = document.getElementById('warningBox');
+    if (d.warning && d.warning.length > 0) {
+        document.getElementById('warningText').textContent = '⚠️ ' + d.warning;
+        warningBox.classList.add('show');
+    } else {
+        warningBox.classList.remove('show');
+    }
+    
+    // Message
+    if (d.msg) document.getElementById('msg').textContent = d.msg;
     
     // Step box
     const stepBox = document.getElementById('stepBox');
@@ -456,23 +497,13 @@ function updateUI(d) {
     }
     
     // Countdown
-    const cdBox = document.getElementById('countdown');
+    const cdEl = document.getElementById('countdown');
     if (d.countdown && d.countdown > 0) {
-        cdBox.textContent = d.countdown;
-        cdBox.classList.add('show');
+        cdEl.textContent = d.countdown;
+        cdEl.classList.add('show');
     } else {
-        cdBox.classList.remove('show');
+        cdEl.classList.remove('show');
     }
-    
-    // Metrics
-    document.getElementById('ratio').textContent = (d.ratio || 1).toFixed(2) + 'x';
-    document.getElementById('uvOff').textContent = d.clear_off || 0;
-    document.getElementById('uvOn').textContent = d.clear || 0;
-    document.getElementById('temp').textContent = d.temp ? d.temp.toFixed(1) + '°C' : '--';
-    
-    // Reading count
-    if (d.clear > 0 && d.status !== 'READY') readingCount++;
-    document.getElementById('count').textContent = '#' + readingCount;
     
     // Bacteria
     const bacBox = document.getElementById('bacteriaBox');
@@ -485,7 +516,7 @@ function updateUI(d) {
     
     // Trend
     const trendBox = document.getElementById('trendBox');
-    if (d.trend && d.trend !== 'INSUFFICIENT' && d.trend !== 'INSUFF') {
+    if (d.trend && d.trend !== 'INSUFFICIENT' && d.trend !== '') {
         const arrows = { IMPROVING: '📉', WORSENING: '📈', STABLE: '➡️' };
         const texts = { IMPROVING: 'Improving!', WORSENING: 'Getting worse', STABLE: 'Stable' };
         document.getElementById('trendArrow').textContent = arrows[d.trend] || '➡️';
@@ -495,14 +526,17 @@ function updateUI(d) {
         trendBox.classList.remove('show');
     }
     
+    // Metrics
+    document.getElementById('ratio').textContent = (d.ratio || 0).toFixed(2) + 'x';
+    document.getElementById('uvValues').textContent = (d.clear_off || 0) + ' → ' + (d.clear || 0);
+    document.getElementById('temp').textContent = d.temp ? d.temp.toFixed(1) + '°C' : '--';
+    
     // Confidence
     const conf = d.confidence || 0;
     document.getElementById('confBar').style.width = conf + '%';
-    const confLevel = conf >= 75 ? 'HIGH' : conf >= 50 ? 'MEDIUM' : 'LOW';
+    const confLevel = conf >= 75 ? 'HIGH' : conf >= 50 ? 'MED' : 'LOW';
     document.getElementById('confLevel').textContent = confLevel;
-    
-    const confBar = document.getElementById('confBar');
-    confBar.style.background = conf >= 75 ? '#4CAF50' : conf >= 50 ? '#FF9800' : '#F44336';
+    document.getElementById('confBar').style.background = conf >= 75 ? '#4CAF50' : conf >= 50 ? '#FF9800' : '#F44336';
 }
 </script>
 </body>
