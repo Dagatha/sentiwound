@@ -42,11 +42,15 @@
         .mr{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1)}
         .mr:last-child{border:none}.ml{opacity:.6}
         .ft{text-align:center;font-size:10px;opacity:.4;margin-top:15px}
+        .dbg{background:#333;border-radius:8px;padding:8px;margin-bottom:12px;font-size:10px;font-family:monospace;word-break:break-all;max-height:80px;overflow:auto}
     </style>
 </head>
 <body>
 <div class="c">
     <h1>🩹 SentiWound</h1>
+    
+    <!-- DEBUG BOX - shows raw data -->
+    <div class="dbg" id="dbg">Debug: waiting for data...</div>
     
     <!-- Status Card -->
     <div class="sc" id="sCard">
@@ -131,15 +135,16 @@
 const I = {HEALTHY:'💚', WATCH:'🔵', CONCERN:'⚠️', ALERT:'🚨', READY:'⏳'};
 const C = {HEALTHY:'#4CAF50', WATCH:'#2196F3', CONCERN:'#FF9800', ALERT:'#F44336', READY:'#9E9E9E'};
 const STAGE = {
-    EARLY: {icon:'🟡', name:'EARLY INFECTION', action:'Clean wound, apply antiseptic, monitor closely'},
-    MOD: {icon:'🟠', name:'MODERATE INFECTION', action:'See a doctor within 24 hours'},
-    SEV: {icon:'🔴', name:'SEVERE INFECTION', action:'Seek emergency medical care NOW'}
+    EARLY: {icon:'🟡', name:'EARLY INFECTION', action:'Clean wound, apply antiseptic'},
+    MOD: {icon:'🟠', name:'MODERATE', action:'See doctor within 24 hours'},
+    SEV: {icon:'🔴', name:'SEVERE', action:'Seek emergency care NOW'}
 };
 
 let dev, cmdC, datC, lastS = '';
 
 document.getElementById('conn').onclick = async () => {
     try {
+        document.getElementById('dbg').textContent = 'Connecting...';
         dev = await navigator.bluetooth.requestDevice({
             filters: [{name: 'SentiWound'}],
             optionalServices: ['12345678-1234-5678-1234-56789abcdef0']
@@ -154,8 +159,10 @@ document.getElementById('conn').onclick = async () => {
         document.querySelectorAll('button').forEach(b => b.disabled = false);
         document.getElementById('conn').textContent = '✅ Connected';
         document.getElementById('msg').textContent = 'Ready!';
+        document.getElementById('dbg').textContent = 'Connected! Waiting for data...';
     } catch(e) {
         document.getElementById('msg').textContent = 'Connection failed';
+        document.getElementById('dbg').textContent = 'Error: ' + e.message;
     }
 };
 
@@ -164,11 +171,20 @@ function disc() {
     document.getElementById('conn').disabled = false;
     document.getElementById('conn').textContent = '🔗 Connect';
     document.getElementById('msg').textContent = 'Disconnected';
+    document.getElementById('dbg').textContent = 'Disconnected';
 }
 
 function onD(e) {
-    try { upd(JSON.parse(new TextDecoder().decode(e.target.value))); } 
-    catch(er) { console.log('Parse err:', er); }
+    try { 
+        const raw = new TextDecoder().decode(e.target.value);
+        const d = JSON.parse(raw);
+        // Show raw data in debug box
+        document.getElementById('dbg').textContent = 'RAW: ' + raw;
+        upd(d); 
+    } 
+    catch(er) { 
+        document.getElementById('dbg').textContent = 'PARSE ERROR: ' + er.message;
+    }
 }
 
 async function cmd(c) {
@@ -206,8 +222,6 @@ function upd(d) {
         document.getElementById('status').textContent = d.st;
         document.getElementById('icon').textContent = I[d.st] || '❓';
         document.getElementById('sCard').style.background = C[d.st] || '#9E9E9E';
-        
-        // Play alert sound on ALERT
         if (d.st === 'ALERT' && lastS !== 'ALERT') playAlert();
         lastS = d.st;
     }
@@ -217,6 +231,8 @@ function upd(d) {
     // Warning banner
     const warn = document.getElementById('warn');
     if (d.st === 'ALERT') {
+        warn.textContent = '🚨 SEEK MEDICAL ATTENTION IMMEDIATELY';
+        warn.style.background = '#f44336';
         warn.classList.add('show');
     } else if (d.st === 'CONCERN') {
         warn.textContent = '⚠️ See a doctor within 24 hours';
@@ -224,8 +240,6 @@ function upd(d) {
         warn.classList.add('show');
     } else {
         warn.classList.remove('show');
-        warn.textContent = '🚨 SEEK MEDICAL ATTENTION IMMEDIATELY';
-        warn.style.background = '#f44336';
     }
     
     // Healing Score
@@ -238,7 +252,7 @@ function upd(d) {
     // Days to heal
     if (d.dy !== undefined) {
         const y = document.getElementById('days');
-        if (d.dy === 0) y.textContent = '✓ Healed';
+        if (d.dy === 0) y.textContent = '✓';
         else if (d.dy < 0) y.textContent = '⚠️';
         else y.textContent = d.dy + 'd';
     }
