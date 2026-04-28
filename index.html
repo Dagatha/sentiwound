@@ -279,22 +279,26 @@ function upd(d) {
     // Message
     if (d.ms) document.getElementById('msg').textContent = d.ms;
     
-    // Step
-    const sp = document.getElementById('step');
-    if (d.sp && d.sp.length > 0) {
-        sp.textContent = d.sp;
-        sp.classList.add('show');
-    } else {
-        sp.classList.remove('show');
+    // Step - only update if sp is in the data
+    if ('sp' in d) {
+        const sp = document.getElementById('step');
+        if (d.sp && d.sp.length > 0) {
+            sp.textContent = d.sp;
+            sp.classList.add('show');
+        } else {
+            sp.classList.remove('show');
+        }
     }
     
-    // Countdown
-    const cd = document.getElementById('cd');
-    if (d.cd && d.cd > 0) {
-        cd.textContent = d.cd;
-        cd.classList.add('show');
-    } else {
-        cd.classList.remove('show');
+    // Countdown - only update if cd is in the data
+    if ('cd' in d) {
+        const cd = document.getElementById('cd');
+        if (d.cd && d.cd > 0) {
+            cd.textContent = d.cd;
+            cd.classList.add('show');
+        } else {
+            cd.classList.remove('show');
+        }
     }
     
     // Metrics
