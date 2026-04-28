@@ -23,31 +23,11 @@
             padding: 20px;
             text-align: center;
             margin-bottom: 12px;
-            transition: all 0.3s;
         }
         .status-card .icon { font-size: 44px; }
         .status-card .status { font-size: 24px; font-weight: 700; margin: 8px 0; }
         .status-card .score { font-size: 42px; font-weight: 700; }
         .status-card .label { font-size: 11px; opacity: 0.8; }
-        
-        /* Alert Box */
-        .alert-box {
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 13px;
-            display: none;
-            animation: pulse 1.5s infinite;
-        }
-        .alert-box.alert { background: linear-gradient(135deg, #d32f2f, #b71c1c); }
-        .alert-box.concern { background: linear-gradient(135deg, #f57c00, #e65100); }
-        .alert-box.show { display: block; }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(0.98); opacity: 0.85; }
-        }
         
         /* Healing Score Card */
         .healing-card {
@@ -62,7 +42,6 @@
         .healing-item { text-align: center; }
         .healing-item .value { font-size: 28px; font-weight: 700; }
         .healing-item .label { font-size: 10px; opacity: 0.8; }
-        .healing-item.warning .value { color: #ffeb3b; }
         
         /* Stage Indicator */
         .stage-box {
@@ -73,25 +52,11 @@
             display: none;
         }
         .stage-box.show { display: block; }
-        .stage-box.NONE { background: linear-gradient(135deg, #4caf50, #388e3c); }
         .stage-box.EARLY { background: linear-gradient(135deg, #ffc107, #ffa000); color: #000; }
         .stage-box.MODERATE { background: linear-gradient(135deg, #ff9800, #f57c00); }
         .stage-box.SEVERE { background: linear-gradient(135deg, #f44336, #c62828); }
         .stage-box .stage-title { font-size: 12px; font-weight: 700; }
         .stage-box .stage-action { font-size: 11px; margin-top: 4px; opacity: 0.9; }
-        
-        /* Warning Box */
-        .warning-box {
-            background: rgba(255, 193, 7, 0.2);
-            border: 1px solid #ffc107;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 12px;
-            text-align: center;
-            font-size: 12px;
-            display: none;
-        }
-        .warning-box.show { display: block; }
         
         /* Bacteria Box */
         .bacteria-box {
@@ -106,18 +71,18 @@
         .bacteria-box .title { font-size: 11px; opacity: 0.8; }
         .bacteria-box .name { font-size: 18px; font-weight: 700; margin-top: 4px; }
         
-        /* Trend Box */
-        .trend-box {
-            background: rgba(33,150,243,0.2);
+        /* Warning Box */
+        .warning-box {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
             border-radius: 10px;
             padding: 10px;
             margin-bottom: 12px;
             text-align: center;
+            font-size: 12px;
             display: none;
         }
-        .trend-box.show { display: block; }
-        .trend-box .arrow { font-size: 22px; }
-        .trend-box .text { font-size: 13px; }
+        .warning-box.show { display: block; }
         
         /* Message */
         .msg {
@@ -202,9 +167,6 @@
         }
         .btn-data { background: #607D8B; font-size: 10px; padding: 8px 4px; }
         
-        /* Treatment Buttons */
-        .btn-tx { background: #9c27b0; font-size: 10px; padding: 8px 4px; }
-        
         /* Metrics */
         .metrics {
             background: rgba(255,255,255,0.08);
@@ -220,16 +182,6 @@
         }
         .metric-row:last-child { border: none; }
         .metric-label { opacity: 0.6; }
-        
-        /* Confidence */
-        .conf-section {
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .conf-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
-        .conf-bar { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
-        .conf-fill { height: 100%; background: #4CAF50; border-radius: 3px; transition: width 0.3s; }
         
         .footer { text-align: center; font-size: 10px; opacity: 0.4; margin-top: 15px; }
     </style>
@@ -261,28 +213,19 @@
     <!-- Stage Indicator -->
     <div class="stage-box" id="stageBox">
         <div class="stage-title" id="stageTitle">NONE</div>
-        <div class="stage-action" id="stageAction">No infection detected</div>
+        <div class="stage-action" id="stageAction"></div>
+    </div>
+    
+    <!-- Bacteria Detection -->
+    <div class="bacteria-box" id="bacteriaBox">
+        <div class="title">🦠 Bacteria Detected</div>
+        <div class="name" id="bacteria">--</div>
     </div>
     
     <!-- Warning Box -->
     <div class="warning-box" id="warningBox">
         <span id="warningText"></span>
     </div>
-    
-    <!-- Bacteria Detection - MOVED UP -->
-    <div class="bacteria-box" id="bacteriaBox">
-        <div class="title">🦠 Bacteria Detected</div>
-        <div class="name" id="bacteria">--</div>
-    </div>
-    
-    <!-- Trend -->
-    <div class="trend-box" id="trendBox">
-        <span class="arrow" id="trendArrow">➡️</span>
-        <span class="text" id="trendText">Stable</span>
-    </div>
-    
-    <!-- Alert Box -->
-    <div class="alert-box" id="alertBox"></div>
     
     <!-- Message -->
     <div class="msg" id="msg">Connect to begin...</div>
@@ -307,31 +250,15 @@
     <div class="section">
         <div class="section-title">🧠 Train AI - Label Last Reading</div>
         <div class="btn-grid-3">
-            <button class="btn-healthy btn-small" onclick="cmd('label_healthy')" disabled>✓ Healthy</button>
-            <button class="btn-infected btn-small" onclick="cmd('label_infected')" disabled>✗ Infected</button>
-            <button class="btn-false btn-small" onclick="cmd('label_false')" disabled>⚠ False</button>
-        </div>
-    </div>
-    
-    <!-- Treatment Logging -->
-    <div class="section">
-        <div class="section-title">💊 Log Treatment</div>
-        <div class="btn-grid-4">
-            <button class="btn-tx" onclick="cmd('tx_neosporin')" disabled>Neosporin</button>
-            <button class="btn-tx" onclick="cmd('tx_bandage')" disabled>Bandage</button>
-            <button class="btn-tx" onclick="cmd('tx_saline')" disabled>Saline</button>
-            <button class="btn-tx" onclick="cmd('tx_antiseptic')" disabled>Antiseptic</button>
-        </div>
-        <div class="btn-grid-3" style="margin-top:6px">
-            <button class="btn-tx" onclick="cmd('tx_antibiotics')" disabled>💉 Antibiotics</button>
-            <button class="btn-tx" onclick="cmd('tx_report')" disabled>📊 Report</button>
-            <button class="btn-tx" onclick="cmd('tx_clear')" disabled>🗑️ Clear</button>
+            <button class="btn-healthy btn-small" id="btnHealthy" onclick="label('healthy')" disabled>✓ Healthy</button>
+            <button class="btn-infected btn-small" id="btnInfected" onclick="label('infected')" disabled>✗ Infected</button>
+            <button class="btn-false btn-small" id="btnFalse" onclick="label('false')" disabled>⚠ False</button>
         </div>
     </div>
     
     <!-- Data Management -->
     <div class="section">
-        <div class="section-title">📊 Data Management</div>
+        <div class="section-title">📊 Data</div>
         <div class="btn-grid-4">
             <button class="btn-data" onclick="cmd('export')" disabled>📤 Export</button>
             <button class="btn-data" onclick="cmd('knn_stats')" disabled>🧠 KNN</button>
@@ -345,19 +272,15 @@
         <div class="metric-row"><span class="metric-label">Fluorescence</span><span id="ratio">1.00x</span></div>
         <div class="metric-row"><span class="metric-label">UV OFF → ON</span><span id="uvValues">0 → 0</span></div>
         <div class="metric-row"><span class="metric-label">Temperature</span><span id="temp">--</span></div>
-        <div class="conf-section">
-            <div class="conf-header"><span>Confidence</span><span id="confLevel">--</span></div>
-            <div class="conf-bar"><div class="conf-fill" id="confBar" style="width:0%"></div></div>
-        </div>
+        <div class="metric-row"><span class="metric-label">Confidence</span><span id="confLevel">--</span></div>
     </div>
     
-    <div class="footer">SentiWound v4.0 • Clinical Intelligence Edition</div>
+    <div class="footer">SentiWound v4.0 • Clinical Intelligence</div>
 </div>
 
 <script>
 const icons = { HEALTHY: '💚', WATCH: '🔵', CONCERN: '⚠️', ALERT: '🚨', READY: '⏳' };
 const colors = { HEALTHY: '#4CAF50', WATCH: '#2196F3', CONCERN: '#FF9800', ALERT: '#F44336', READY: '#9E9E9E' };
-const stageIcons = { NONE: '✅', EARLY: '🟡', MODERATE: '🟠', SEVERE: '🔴' };
 
 let device, cmdChar, dataChar, lastStatus = '';
 
@@ -376,9 +299,9 @@ document.getElementById('connectBtn').onclick = async () => {
         dataChar.addEventListener('characteristicvaluechanged', onData);
         document.querySelectorAll('button').forEach(b => b.disabled = false);
         document.getElementById('connectBtn').textContent = '✅ Connected';
-        document.getElementById('msg').textContent = 'Ready! Choose an action.';
+        document.getElementById('msg').textContent = 'Ready!';
     } catch (e) {
-        document.getElementById('msg').textContent = 'Connection failed: ' + e.message;
+        document.getElementById('msg').textContent = 'Connection failed';
     }
 };
 
@@ -386,21 +309,26 @@ function onDisconnect() {
     document.querySelectorAll('button').forEach(b => b.disabled = true);
     document.getElementById('connectBtn').disabled = false;
     document.getElementById('connectBtn').textContent = '🔗 Connect';
-    document.getElementById('msg').textContent = 'Disconnected. Reconnect?';
+    document.getElementById('msg').textContent = 'Disconnected';
 }
 
 function onData(e) {
-    try {
-        const d = JSON.parse(new TextDecoder().decode(e.target.value));
-        updateUI(d);
-    } catch (err) {}
+    try { updateUI(JSON.parse(new TextDecoder().decode(e.target.value))); } catch (err) {}
 }
 
 async function cmd(c) {
-    if (cmdChar) {
-        try { await cmdChar.writeValue(new TextEncoder().encode(c)); }
-        catch (e) { document.getElementById('msg').textContent = 'Send failed'; }
-    }
+    if (cmdChar) try { await cmdChar.writeValue(new TextEncoder().encode(c)); } catch (e) {}
+}
+
+async function label(type) {
+    const btn = document.getElementById('btn' + type.charAt(0).toUpperCase() + type.slice(1));
+    const origText = btn.textContent;
+    btn.textContent = '...';
+    await cmd('label_' + type);
+    setTimeout(() => {
+        btn.textContent = '✓ Saved!';
+        setTimeout(() => { btn.textContent = origText; }, 1000);
+    }, 300);
 }
 
 function playAlert() {
@@ -425,60 +353,31 @@ function updateUI(d) {
     if (d.status === 'ALERT' && lastStatus !== 'ALERT') playAlert();
     lastStatus = d.status;
     
-    // Alert box
-    const alertBox = document.getElementById('alertBox');
-    if (d.status === 'ALERT') {
-        alertBox.textContent = '🚨 ALERT: Seek medical attention immediately!';
-        alertBox.className = 'alert-box alert show';
-    } else if (d.status === 'CONCERN') {
-        alertBox.textContent = '⚠️ CONCERN: See a doctor within 24 hours';
-        alertBox.className = 'alert-box concern show';
-    } else {
-        alertBox.className = 'alert-box';
-    }
-    
     // Healing Score
     const healingEl = document.getElementById('healingScore');
-    if (d.healing !== undefined && d.healing !== null) {
+    if (d.healing !== undefined) {
         healingEl.textContent = d.healing;
-        if (d.healing >= 70) healingEl.style.color = '#4caf50';
-        else if (d.healing >= 40) healingEl.style.color = '#ffeb3b';
-        else healingEl.style.color = '#ff5722';
-    } else {
-        healingEl.textContent = '--';
+        healingEl.style.color = d.healing >= 70 ? '#4caf50' : d.healing >= 40 ? '#ffeb3b' : '#ff5722';
     }
     
     // Days to Heal
     const daysEl = document.getElementById('daysToHeal');
     if (d.days !== undefined) {
         if (d.days === 0) daysEl.textContent = '✓';
-        else if (d.days === -1) { daysEl.textContent = '📉'; daysEl.parentElement.classList.add('warning'); }
-        else if (d.days === -2) { daysEl.textContent = '⏸️'; daysEl.parentElement.classList.add('warning'); }
-        else { daysEl.textContent = d.days + 'd'; daysEl.parentElement.classList.remove('warning'); }
+        else if (d.days < 0) daysEl.textContent = '⚠️';
+        else daysEl.textContent = d.days + 'd';
     }
     
     // Stage Box
     const stageBox = document.getElementById('stageBox');
     if (d.stage && d.stage !== 'NONE') {
         stageBox.className = 'stage-box show ' + d.stage;
-        document.getElementById('stageTitle').textContent = stageIcons[d.stage] + ' ' + d.stage;
-        const actions = {
-            EARLY: 'Clean wound, apply antiseptic, monitor closely',
-            MODERATE: 'See doctor within 24 hours',
-            SEVERE: 'Seek medical attention immediately'
-        };
+        const stageIcons = { EARLY: '🟡', MODERATE: '🟠', SEVERE: '🔴' };
+        const actions = { EARLY: 'Clean & monitor', MODERATE: 'See doctor 24h', SEVERE: 'Seek care now' };
+        document.getElementById('stageTitle').textContent = (stageIcons[d.stage] || '') + ' ' + d.stage;
         document.getElementById('stageAction').textContent = actions[d.stage] || '';
     } else {
         stageBox.className = 'stage-box';
-    }
-    
-    // Warning Box
-    const warningBox = document.getElementById('warningBox');
-    if (d.warning && d.warning.length > 0) {
-        document.getElementById('warningText').textContent = '⚠️ ' + d.warning;
-        warningBox.classList.add('show');
-    } else {
-        warningBox.classList.remove('show');
     }
     
     // Bacteria Box
@@ -490,16 +389,13 @@ function updateUI(d) {
         bacBox.classList.remove('show');
     }
     
-    // Trend
-    const trendBox = document.getElementById('trendBox');
-    if (d.trend && d.trend !== 'INSUFFICIENT' && d.trend !== '') {
-        const arrows = { IMPROVING: '📉', WORSENING: '📈', STABLE: '➡️' };
-        const texts = { IMPROVING: 'Improving!', WORSENING: 'Getting worse', STABLE: 'Stable' };
-        document.getElementById('trendArrow').textContent = arrows[d.trend] || '➡️';
-        document.getElementById('trendText').textContent = texts[d.trend] || d.trend;
-        trendBox.classList.add('show');
+    // Warning Box
+    const warningBox = document.getElementById('warningBox');
+    if (d.warning && d.warning.length > 0) {
+        document.getElementById('warningText').textContent = '⚠️ ' + d.warning;
+        warningBox.classList.add('show');
     } else {
-        trendBox.classList.remove('show');
+        warningBox.classList.remove('show');
     }
     
     // Message
@@ -527,13 +423,7 @@ function updateUI(d) {
     document.getElementById('ratio').textContent = (d.ratio || 0).toFixed(2) + 'x';
     document.getElementById('uvValues').textContent = (d.clear_off || 0) + ' → ' + (d.clear || 0);
     document.getElementById('temp').textContent = d.temp ? d.temp.toFixed(1) + '°C' : '--';
-    
-    // Confidence
-    const conf = d.confidence || 0;
-    document.getElementById('confBar').style.width = conf + '%';
-    const confLevel = conf >= 75 ? 'HIGH' : conf >= 50 ? 'MED' : 'LOW';
-    document.getElementById('confLevel').textContent = confLevel;
-    document.getElementById('confBar').style.background = conf >= 75 ? '#4CAF50' : conf >= 50 ? '#FF9800' : '#F44336';
+    document.getElementById('confLevel').textContent = (d.confidence || 0) >= 75 ? 'HIGH' : (d.confidence || 0) >= 50 ? 'MED' : 'LOW';
 }
 </script>
 </body>
