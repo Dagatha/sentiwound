@@ -15,8 +15,12 @@
         .hi{text-align:center}.hi .v{font-size:28px;font-weight:700}.hi .l{font-size:10px;opacity:.8}
         .sb{border-radius:10px;padding:10px;margin-bottom:12px;text-align:center;display:none}
         .sb.show{display:block}.sb.EARLY{background:#ffc107;color:#000}.sb.MOD{background:#ff9800}.sb.SEV{background:#f44336}
+        .sb .t{font-size:13px;font-weight:700}.sb .a{font-size:11px;margin-top:4px;opacity:.9}
         .bb{background:linear-gradient(135deg,#7b1fa2,#4a148c);border-radius:10px;padding:12px;margin-bottom:12px;text-align:center;display:none}
         .bb.show{display:block}.bb .t{font-size:11px;opacity:.8}.bb .n{font-size:18px;font-weight:700;margin-top:4px}
+        .warn{background:#f44336;border-radius:10px;padding:14px;margin-bottom:12px;text-align:center;font-weight:700;font-size:14px;display:none;animation:pulse 1s infinite}
+        .warn.show{display:block}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
         .ms{background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center;margin-bottom:12px;font-size:13px;min-height:42px}
         .sp{background:linear-gradient(135deg,#FF9800,#F57C00);color:#000;border-radius:10px;padding:12px;text-align:center;margin-bottom:10px;font-weight:600;display:none}
         .sp.show{display:block}
@@ -43,13 +47,44 @@
 <body>
 <div class="c">
     <h1>🩹 SentiWound</h1>
-    <div class="sc" id="sCard"><div class="i" id="icon">⏳</div><div class="s" id="status">READY</div><div class="n" id="score">0</div><div class="l">Risk Score</div></div>
-    <div class="hc"><div class="hi"><div class="v" id="hs">--</div><div class="l">💊 HEALING SCORE™</div></div><div class="hi"><div class="v" id="days">--</div><div class="l">📅 Days to Heal</div></div></div>
-    <div class="sb" id="stage"><span id="stageT"></span></div>
-    <div class="bb" id="bac"><div class="t">🦠 Bacteria</div><div class="n" id="bacN">--</div></div>
+    
+    <!-- Status Card -->
+    <div class="sc" id="sCard">
+        <div class="i" id="icon">⏳</div>
+        <div class="s" id="status">READY</div>
+        <div class="n" id="score">0</div>
+        <div class="l">Risk Score</div>
+    </div>
+    
+    <!-- Warning Banner -->
+    <div class="warn" id="warn">🚨 SEEK MEDICAL ATTENTION IMMEDIATELY</div>
+    
+    <!-- Healing Score -->
+    <div class="hc">
+        <div class="hi"><div class="v" id="hs">--</div><div class="l">💊 HEALING SCORE™</div></div>
+        <div class="hi"><div class="v" id="days">--</div><div class="l">📅 Days to Heal</div></div>
+    </div>
+    
+    <!-- Stage -->
+    <div class="sb" id="stage">
+        <div class="t" id="stageT"></div>
+        <div class="a" id="stageA"></div>
+    </div>
+    
+    <!-- Bacteria -->
+    <div class="bb" id="bac">
+        <div class="t">🦠 Bacteria Detected</div>
+        <div class="n" id="bacN">--</div>
+    </div>
+    
+    <!-- Message -->
     <div class="ms" id="msg">Connect to begin...</div>
+    
+    <!-- Step & Countdown -->
     <div class="sp" id="step"></div>
     <div class="cd" id="cd"></div>
+    
+    <!-- Main Buttons -->
     <div class="bg">
         <button class="bc" id="conn">🔗 Connect</button>
         <button onclick="cmd('calibrate')" disabled>🎯 Quick Cal</button>
@@ -60,115 +95,198 @@
         <button class="bs" onclick="cmd('start')" disabled>▶️ Monitor</button>
         <button class="bt" onclick="cmd('stop')" disabled>⏹️ Stop</button>
     </div>
-    <div class="sec"><div class="sec-t">🧠 Train AI</div><div class="bg3">
-        <button class="bh bsm" id="lh" onclick="lbl('healthy')" disabled>✓ Healthy</button>
-        <button class="bi bsm" id="li" onclick="lbl('infected')" disabled>✗ Infected</button>
-        <button class="bf bsm" id="lf" onclick="lbl('false')" disabled>⚠ False</button>
-    </div></div>
-    <div class="sec"><div class="sec-t">📊 Data</div><div class="bg4">
-        <button class="bd" onclick="cmd('export')" disabled>📤</button>
-        <button class="bd" onclick="cmd('knn_stats')" disabled>🧠</button>
-        <button class="bd" onclick="cmd('history_clear')" disabled>📜</button>
-        <button class="bd" onclick="cmd('clear_all')" disabled>🗑️</button>
-    </div></div>
+    
+    <!-- ML Training -->
+    <div class="sec">
+        <div class="sec-t">🧠 Train AI</div>
+        <div class="bg3">
+            <button class="bh bsm" id="lh" onclick="lbl('healthy')" disabled>✓ Healthy</button>
+            <button class="bi bsm" id="li" onclick="lbl('infected')" disabled>✗ Infected</button>
+            <button class="bf bsm" id="lf" onclick="lbl('false')" disabled>⚠ False</button>
+        </div>
+    </div>
+    
+    <!-- Data -->
+    <div class="sec">
+        <div class="sec-t">📊 Data</div>
+        <div class="bg4">
+            <button class="bd" onclick="cmd('export')" disabled>📤</button>
+            <button class="bd" onclick="cmd('knn_stats')" disabled>🧠</button>
+            <button class="bd" onclick="cmd('history_clear')" disabled>📜</button>
+            <button class="bd" onclick="cmd('clear_all')" disabled>🗑️</button>
+        </div>
+    </div>
+    
+    <!-- Metrics -->
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">--</span></div>
         <div class="mr"><span class="ml">UV</span><span id="uv">--</span></div>
         <div class="mr"><span class="ml">Temp</span><span id="temp">--</span></div>
     </div>
+    
     <div class="ft">SentiWound v4.1</div>
 </div>
-<script>
-const I={HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'⏳'};
-const C={HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9E9E9E'};
-const S={EARLY:'🟡 EARLY',MOD:'🟠 MODERATE',SEV:'🔴 SEVERE'};
-let dev,cmdC,datC,lastS='';
 
-document.getElementById('conn').onclick=async()=>{
-    try{
-        dev=await navigator.bluetooth.requestDevice({filters:[{name:'SentiWound'}],optionalServices:['12345678-1234-5678-1234-56789abcdef0']});
-        dev.addEventListener('gattserverdisconnected',disc);
-        const srv=await dev.gatt.connect();
-        const svc=await srv.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
-        cmdC=await svc.getCharacteristic('12345678-1234-5678-1234-56789abcdef1');
-        datC=await svc.getCharacteristic('12345678-1234-5678-1234-56789abcdef2');
-        await datC.startNotifications();
-        datC.addEventListener('characteristicvaluechanged',onD);
-        document.querySelectorAll('button').forEach(b=>b.disabled=false);
-        document.getElementById('conn').textContent='✅ Connected';
-        document.getElementById('msg').textContent='Ready!';
-    }catch(e){document.getElementById('msg').textContent='Failed';}
+<script>
+const I = {HEALTHY:'💚', WATCH:'🔵', CONCERN:'⚠️', ALERT:'🚨', READY:'⏳'};
+const C = {HEALTHY:'#4CAF50', WATCH:'#2196F3', CONCERN:'#FF9800', ALERT:'#F44336', READY:'#9E9E9E'};
+const STAGE = {
+    EARLY: {icon:'🟡', name:'EARLY INFECTION', action:'Clean wound, apply antiseptic, monitor closely'},
+    MOD: {icon:'🟠', name:'MODERATE INFECTION', action:'See a doctor within 24 hours'},
+    SEV: {icon:'🔴', name:'SEVERE INFECTION', action:'Seek emergency medical care NOW'}
 };
 
-function disc(){
-    document.querySelectorAll('button').forEach(b=>b.disabled=true);
-    document.getElementById('conn').disabled=false;
-    document.getElementById('conn').textContent='🔗 Connect';
-    document.getElementById('msg').textContent='Disconnected';
-}
+let dev, cmdC, datC, lastS = '';
 
-function onD(e){try{upd(JSON.parse(new TextDecoder().decode(e.target.value)));}catch(er){}}
-
-async function cmd(c){if(cmdC)try{await cmdC.writeValue(new TextEncoder().encode(c));}catch(e){}}
-
-async function lbl(t){
-    const b=document.getElementById('l'+t[0]);
-    const o=b.textContent;b.textContent='...';
-    await cmd('label_'+t);
-    setTimeout(()=>{b.textContent='✓';setTimeout(()=>b.textContent=o,800);},200);
-}
-
-function upd(d){
-    // Status
-    if(d.st){
-        document.getElementById('status').textContent=d.st;
-        document.getElementById('icon').textContent=I[d.st]||'❓';
-        document.getElementById('sCard').style.background=C[d.st]||'#9E9E9E';
-        if(d.st==='ALERT'&&lastS!=='ALERT')try{new(window.AudioContext||window.webkitAudioContext)().createOscillator().start();}catch(e){}
-        lastS=d.st;
+document.getElementById('conn').onclick = async () => {
+    try {
+        dev = await navigator.bluetooth.requestDevice({
+            filters: [{name: 'SentiWound'}],
+            optionalServices: ['12345678-1234-5678-1234-56789abcdef0']
+        });
+        dev.addEventListener('gattserverdisconnected', disc);
+        const srv = await dev.gatt.connect();
+        const svc = await srv.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
+        cmdC = await svc.getCharacteristic('12345678-1234-5678-1234-56789abcdef1');
+        datC = await svc.getCharacteristic('12345678-1234-5678-1234-56789abcdef2');
+        await datC.startNotifications();
+        datC.addEventListener('characteristicvaluechanged', onD);
+        document.querySelectorAll('button').forEach(b => b.disabled = false);
+        document.getElementById('conn').textContent = '✅ Connected';
+        document.getElementById('msg').textContent = 'Ready!';
+    } catch(e) {
+        document.getElementById('msg').textContent = 'Connection failed';
     }
-    if(d.sc!==undefined)document.getElementById('score').textContent=Math.round(d.sc);
+};
+
+function disc() {
+    document.querySelectorAll('button').forEach(b => b.disabled = true);
+    document.getElementById('conn').disabled = false;
+    document.getElementById('conn').textContent = '🔗 Connect';
+    document.getElementById('msg').textContent = 'Disconnected';
+}
+
+function onD(e) {
+    try { upd(JSON.parse(new TextDecoder().decode(e.target.value))); } 
+    catch(er) { console.log('Parse err:', er); }
+}
+
+async function cmd(c) {
+    if (cmdC) try { await cmdC.writeValue(new TextEncoder().encode(c)); } catch(e) {}
+}
+
+async function lbl(t) {
+    const btn = document.getElementById('l' + t[0]);
+    const orig = btn.textContent;
+    btn.textContent = '...';
+    await cmd('label_' + t);
+    setTimeout(() => {
+        btn.textContent = '✓ Saved!';
+        setTimeout(() => btn.textContent = orig, 800);
+    }, 200);
+}
+
+function playAlert() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        gain.gain.value = 0.3;
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+}
+
+function upd(d) {
+    // Status card
+    if (d.st) {
+        document.getElementById('status').textContent = d.st;
+        document.getElementById('icon').textContent = I[d.st] || '❓';
+        document.getElementById('sCard').style.background = C[d.st] || '#9E9E9E';
+        
+        // Play alert sound on ALERT
+        if (d.st === 'ALERT' && lastS !== 'ALERT') playAlert();
+        lastS = d.st;
+    }
     
-    // Healing
-    if(d.hs!==undefined){
-        const h=document.getElementById('hs');
-        h.textContent=d.hs;
-        h.style.color=d.hs>=70?'#4caf50':d.hs>=40?'#ffeb3b':'#ff5722';
+    if (d.sc !== undefined) document.getElementById('score').textContent = Math.round(d.sc);
+    
+    // Warning banner
+    const warn = document.getElementById('warn');
+    if (d.st === 'ALERT') {
+        warn.classList.add('show');
+    } else if (d.st === 'CONCERN') {
+        warn.textContent = '⚠️ See a doctor within 24 hours';
+        warn.style.background = '#ff9800';
+        warn.classList.add('show');
+    } else {
+        warn.classList.remove('show');
+        warn.textContent = '🚨 SEEK MEDICAL ATTENTION IMMEDIATELY';
+        warn.style.background = '#f44336';
     }
-    if(d.dy!==undefined){
-        const y=document.getElementById('days');
-        y.textContent=d.dy===0?'✓':d.dy<0?'⚠️':d.dy+'d';
+    
+    // Healing Score
+    if (d.hs !== undefined) {
+        const h = document.getElementById('hs');
+        h.textContent = d.hs;
+        h.style.color = d.hs >= 70 ? '#4caf50' : d.hs >= 40 ? '#ffeb3b' : '#ff5722';
+    }
+    
+    // Days to heal
+    if (d.dy !== undefined) {
+        const y = document.getElementById('days');
+        if (d.dy === 0) y.textContent = '✓ Healed';
+        else if (d.dy < 0) y.textContent = '⚠️';
+        else y.textContent = d.dy + 'd';
     }
     
     // Stage
-    const sb=document.getElementById('stage');
-    if(d.sg&&d.sg!=='NONE'){
-        sb.className='sb show '+d.sg;
-        document.getElementById('stageT').textContent=S[d.sg]||d.sg;
-    }else sb.className='sb';
+    const sb = document.getElementById('stage');
+    if (d.sg && d.sg !== 'NONE' && STAGE[d.sg]) {
+        sb.className = 'sb show ' + d.sg;
+        document.getElementById('stageT').textContent = STAGE[d.sg].icon + ' ' + STAGE[d.sg].name;
+        document.getElementById('stageA').textContent = STAGE[d.sg].action;
+    } else {
+        sb.className = 'sb';
+    }
     
     // Bacteria
-    const bb=document.getElementById('bac');
-    if(d.ba){document.getElementById('bacN').textContent=d.ba;bb.classList.add('show');}
-    else bb.classList.remove('show');
+    const bb = document.getElementById('bac');
+    if (d.ba) {
+        document.getElementById('bacN').textContent = d.ba;
+        bb.classList.add('show');
+    } else {
+        bb.classList.remove('show');
+    }
     
     // Message
-    if(d.ms)document.getElementById('msg').textContent=d.ms;
+    if (d.ms) document.getElementById('msg').textContent = d.ms;
     
     // Step
-    const sp=document.getElementById('step');
-    if(d.sp&&d.sp.length>0){sp.textContent=d.sp;sp.classList.add('show');}
-    else sp.classList.remove('show');
+    const sp = document.getElementById('step');
+    if (d.sp && d.sp.length > 0) {
+        sp.textContent = d.sp;
+        sp.classList.add('show');
+    } else {
+        sp.classList.remove('show');
+    }
     
     // Countdown
-    const cd=document.getElementById('cd');
-    if(d.cd&&d.cd>0){cd.textContent=d.cd;cd.classList.add('show');}
-    else cd.classList.remove('show');
+    const cd = document.getElementById('cd');
+    if (d.cd && d.cd > 0) {
+        cd.textContent = d.cd;
+        cd.classList.add('show');
+    } else {
+        cd.classList.remove('show');
+    }
     
     // Metrics
-    if(d.rt!==undefined)document.getElementById('ratio').textContent=d.rt.toFixed(2)+'x';
-    if(d.uo!==undefined&&d.un!==undefined)document.getElementById('uv').textContent=d.uo+'→'+d.un;
-    if(d.tp)document.getElementById('temp').textContent=d.tp.toFixed(1)+'°C';
+    if (d.rt !== undefined) document.getElementById('ratio').textContent = d.rt.toFixed(2) + 'x';
+    if (d.uo !== undefined && d.un !== undefined) document.getElementById('uv').textContent = d.uo + ' → ' + d.un;
+    if (d.tp) document.getElementById('temp').textContent = d.tp.toFixed(1) + '°C';
 }
 </script>
 </body>
