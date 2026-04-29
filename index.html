@@ -275,7 +275,6 @@ document.getElementById('conn').onclick = async () => {
         document.querySelectorAll('button').forEach(b => b.disabled = false);
         document.getElementById('conn').textContent = '✅ Connected';
         document.getElementById('msg').textContent = 'Ready!';
-        // Get current wound info
         cmd('get_wound');
     } catch(e) {
         document.getElementById('msg').textContent = 'Connection failed';
@@ -294,7 +293,9 @@ function onD(e) {
         const raw = new TextDecoder().decode(e.target.value);
         document.getElementById('dbg').textContent = 'RAW: ' + raw;
         upd(JSON.parse(raw)); 
-    } catch(er) {}
+    } catch(er) {
+        document.getElementById('dbg').textContent = 'ERR: ' + er;
+    }
 }
 
 async function cmd(c) {
@@ -312,29 +313,60 @@ async function lbl(t) {
     }, 200);
 }
 
-// Wound Setup
+// Wound Setup - FIXED
 function showSetup() {
-    document.getElementById('setupPanel').classList.toggle('show');
+    const panel = document.getElementById('setupPanel');
+    if (panel.classList.contains('show')) {
+        panel.classList.remove('show');
+    } else {
+        panel.classList.add('show');
+    }
 }
 
 function selectWound(type) {
     selectedWound = type;
+    // Clear all selections
     document.querySelectorAll('.setup-btn').forEach(b => b.classList.remove('selected'));
-    event.target.closest('.setup-btn').classList.add('selected');
+    // Find and highlight the clicked button
+    const buttons = document.querySelectorAll('.setup-btn');
+    buttons.forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(type) || 
+            (type === 'cut' && btn.textContent.includes('Cut')) ||
+            (type === 'burn' && btn.textContent.includes('Burn')) ||
+            (type === 'surgical' && btn.textContent.includes('Surgical')) ||
+            (type === 'chronic' && btn.textContent.includes('Chronic'))) {
+            btn.classList.add('selected');
+        }
+    });
+    document.getElementById('msg').textContent = 'Selected: ' + WOUNDS[type].icon + ' ' + WOUNDS[type].name;
 }
 
 async function confirmWoundSetup() {
     if (!selectedWound) {
-        document.getElementById('msg').textContent = 'Select a wound type first';
+        document.getElementById('msg').textContent = '⚠ Select a wound type first!';
         return;
     }
     const days = parseInt(document.getElementById('daysAgo').value) || 0;
+    
+    document.getElementById('msg').textContent = 'Setting up...';
+    
+    // Send wound type
     await cmd('wound_' + selectedWound);
+    
+    // Send days if > 0
     if (days > 0) {
-        await new Promise(r => setTimeout(r, 200));
+        await new Promise(r => setTimeout(r, 300));
         await cmd('days_' + days);
     }
+    
+    // Hide panel
     document.getElementById('setupPanel').classList.remove('show');
+    
+    // Update header immediately
+    const w = WOUNDS[selectedWound];
+    document.getElementById('woundType').textContent = w.icon + ' ' + w.name;
+    document.getElementById('woundDay').textContent = 'Day ' + (days + 1) + ' of ~10';
+    document.getElementById('woundHeader').classList.add('show');
 }
 
 function playAlert() {
