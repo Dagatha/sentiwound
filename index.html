@@ -10,12 +10,10 @@
         .c{max-width:400px;margin:0 auto}
         h1{text-align:center;font-size:22px;margin-bottom:15px}
         
-        /* Wound Header */
         .wh{background:rgba(255,255,255,0.1);border-radius:12px;padding:12px;margin-bottom:12px;text-align:center;display:none}
         .wh.show{display:block}
         .wh .wt{font-size:18px;font-weight:700}.wh .wd{font-size:12px;opacity:0.8;margin-top:4px}
         
-        /* Setup Panel */
         .setup{background:linear-gradient(135deg,#2196F3,#1976D2);border-radius:12px;padding:15px;margin-bottom:12px;display:none}
         .setup.show{display:block}
         .setup h2{font-size:16px;margin-bottom:12px;text-align:center}
@@ -29,20 +27,33 @@
         .days-row input{width:60px;padding:8px;border-radius:8px;border:none;text-align:center;font-size:16px}
         .setup-confirm{background:#4CAF50;width:100%;margin-top:12px;padding:14px;font-size:15px;font-weight:700}
         
-        /* Status Card */
         .sc{background:#9E9E9E;border-radius:16px;padding:20px;text-align:center;margin-bottom:12px}
         .sc .i{font-size:44px}.sc .s{font-size:24px;font-weight:700;margin:8px 0}.sc .n{font-size:42px;font-weight:700}.sc .l{font-size:11px;opacity:.8}
         
-        /* Warning Banner */
         .warn{background:#f44336;border-radius:10px;padding:14px;margin-bottom:12px;text-align:center;font-weight:700;font-size:14px;display:none;animation:pulse 1s infinite}
         .warn.show{display:block}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
         
-        /* Healing Card */
+        /* Prediction Box - NEW */
+        .pred{background:linear-gradient(135deg,#6a1b9a,#4a148c);border-radius:12px;padding:14px;margin-bottom:12px;display:none}
+        .pred.show{display:block}
+        .pred-title{font-size:14px;font-weight:700;margin-bottom:10px;text-align:center}
+        .pred-dir{text-align:center;font-size:18px;font-weight:700;margin-bottom:10px}
+        .pred-dir.WORSENING{color:#ff5252}.pred-dir.IMPROVING{color:#69f0ae}.pred-dir.STABLE{color:#fff}
+        .pred-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+        .pred-item{background:rgba(255,255,255,0.1);border-radius:8px;padding:10px}
+        .pred-item .time{font-size:11px;opacity:0.7}
+        .pred-item .status{font-size:14px;font-weight:700;margin:4px 0}
+        .pred-item .conf{font-size:10px;opacity:0.6}
+        .pred-item.HEALTHY .status{color:#69f0ae}
+        .pred-item.WATCH .status{color:#42a5f5}
+        .pred-item.CONCERN .status{color:#ffa726}
+        .pred-item.ALERT .status{color:#ff5252}
+        .pred-warn{background:#ff5252;border-radius:8px;padding:10px;margin-top:10px;text-align:center;font-weight:700;font-size:13px;animation:pulse 1s infinite}
+        
         .hc{background:linear-gradient(135deg,#1565c0,#0d47a1);border-radius:12px;padding:14px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
         .hi{text-align:center}.hi .v{font-size:28px;font-weight:700}.hi .l{font-size:10px;opacity:.8}
         
-        /* Progress Bar */
         .prog{background:rgba(255,255,255,0.1);border-radius:10px;padding:12px;margin-bottom:12px}
         .prog-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px}
         .prog-bar{height:12px;background:rgba(255,255,255,0.2);border-radius:6px;overflow:hidden;position:relative}
@@ -50,44 +61,36 @@
         .prog-expected{position:absolute;top:0;height:100%;width:3px;background:#fff;opacity:0.7}
         .prog-text{text-align:center;margin-top:8px;font-size:12px}
         
-        /* Stage Box */
         .sb{border-radius:10px;padding:10px;margin-bottom:12px;text-align:center;display:none}
         .sb.show{display:block}.sb.EARLY{background:#ffc107;color:#000}.sb.MOD{background:#ff9800}.sb.SEV{background:#f44336}
         .sb .t{font-size:13px;font-weight:700}.sb .a{font-size:11px;margin-top:4px;opacity:.9}
         
-        /* Bacteria Box */
         .bb{background:linear-gradient(135deg,#7b1fa2,#4a148c);border-radius:10px;padding:12px;margin-bottom:12px;text-align:center;display:none}
         .bb.show{display:block}.bb .t{font-size:11px;opacity:.8}.bb .n{font-size:18px;font-weight:700;margin-top:4px}
         
-        /* Trend Box */
         .tb{border-radius:10px;padding:10px;margin-bottom:12px;text-align:center;display:none}
         .tb.show{display:block}
         .tb.IMPROVING{background:rgba(76,175,80,0.3)}.tb.WORSENING{background:rgba(244,67,54,0.3)}.tb.STABLE{background:rgba(255,255,255,0.1)}
         
-        /* Tips Box */
         .tips{background:linear-gradient(135deg,rgba(0,150,136,0.3),rgba(0,121,107,0.3));border-radius:10px;padding:12px;margin-bottom:12px;display:none}
         .tips.show{display:block}
         .tips-title{font-size:13px;font-weight:700;margin-bottom:8px}
         .tips ul{margin:0;padding-left:20px}
         .tips li{font-size:12px;margin:6px 0;opacity:0.9;line-height:1.4}
         
-        /* Message */
         .ms{background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center;margin-bottom:12px;font-size:13px;min-height:42px}
         
-        /* Step & Countdown */
         .sp{background:linear-gradient(135deg,#FF9800,#F57C00);color:#000;border-radius:10px;padding:12px;text-align:center;margin-bottom:10px;font-weight:600;display:none}
         .sp.show{display:block}
         .cd{background:rgba(255,152,0,.3);border-radius:50%;width:70px;height:70px;display:none;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto 12px}
         .cd.show{display:flex}
         
-        /* Buttons */
         .bg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
         button{background:rgba(255,255,255,.15);border:none;border-radius:10px;padding:12px 8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
         button:disabled{opacity:.4}
         .bc{background:#2196F3;grid-column:span 2;font-size:16px}
         .bs{background:#4CAF50}.bt{background:#F44336}
         
-        /* Sections */
         .sec{background:rgba(255,255,255,.05);border-radius:10px;padding:10px;margin-bottom:12px}
         .sec-t{font-size:11px;opacity:.7;margin-bottom:8px;text-align:center}
         .bg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
@@ -96,31 +99,25 @@
         .bg4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
         .bd{background:#607D8B;font-size:10px;padding:8px 4px}
         
-        /* Metrics */
         .mt{background:rgba(255,255,255,.08);border-radius:10px;padding:10px;font-size:12px}
         .mr{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1)}
         .mr:last-child{border:none}.ml{opacity:.6}
         
         .ft{text-align:center;font-size:10px;opacity:.4;margin-top:15px}
-        
-        /* Debug */
         .dbg{background:#333;border-radius:8px;padding:8px;margin-bottom:12px;font-size:9px;font-family:monospace;word-break:break-all;max-height:60px;overflow:auto;display:none}
     </style>
 </head>
 <body>
 <div class="c">
-    <h1>🩹 SentiWound v5</h1>
+    <h1>🩹 SentiWound v5.5</h1>
     
-    <!-- Debug Box (hidden by default) -->
     <div class="dbg" id="dbg"></div>
     
-    <!-- Wound Header -->
     <div class="wh" id="woundHeader">
         <div class="wt" id="woundType">🩹 General Wound</div>
         <div class="wd" id="woundDay">Day 1 of ~10</div>
     </div>
     
-    <!-- Wound Setup Panel -->
     <div class="setup" id="setupPanel">
         <h2>🩹 Setup Wound Tracking</h2>
         <div class="setup-grid">
@@ -146,7 +143,6 @@
         </button>
     </div>
     
-    <!-- Status Card -->
     <div class="sc" id="sCard">
         <div class="i" id="icon">⏳</div>
         <div class="s" id="status">READY</div>
@@ -154,16 +150,39 @@
         <div class="l">Risk Score</div>
     </div>
     
-    <!-- Warning Banner -->
     <div class="warn" id="warn">🚨 SEEK MEDICAL ATTENTION IMMEDIATELY</div>
     
-    <!-- Healing Score -->
+    <!-- Prediction Box - NEW -->
+    <div class="pred" id="predBox">
+        <div class="pred-title">🔮 INFECTION FORECAST</div>
+        <div class="pred-dir" id="predDir">STABLE</div>
+        <div class="pred-grid">
+            <div class="pred-item" id="pred6">
+                <div class="time">+6 hours</div>
+                <div class="status" id="pred6st">--</div>
+                <div class="conf" id="pred6c">--%</div>
+            </div>
+            <div class="pred-item" id="pred12">
+                <div class="time">+12 hours</div>
+                <div class="status" id="pred12st">--</div>
+                <div class="conf" id="pred12c">--%</div>
+            </div>
+            <div class="pred-item" id="pred24">
+                <div class="time">+24 hours</div>
+                <div class="status" id="pred24st">--</div>
+                <div class="conf" id="pred24c">--%</div>
+            </div>
+        </div>
+        <div class="pred-warn" id="predWarn" style="display:none">
+            ⚠️ ALERT in <span id="predHours">--</span> hours - ACT NOW!
+        </div>
+    </div>
+    
     <div class="hc">
         <div class="hi"><div class="v" id="hs">--</div><div class="l">💊 HEALING %</div></div>
         <div class="hi"><div class="v" id="days">--</div><div class="l">📅 Days Left</div></div>
     </div>
     
-    <!-- Progress Bar -->
     <div class="prog" id="progBox">
         <div class="prog-label">
             <span>Healing Progress</span>
@@ -176,38 +195,31 @@
         <div class="prog-text" id="progText">Take a reading to see progress</div>
     </div>
     
-    <!-- Stage Box -->
     <div class="sb" id="stage">
         <div class="t" id="stageT"></div>
         <div class="a" id="stageA"></div>
     </div>
     
-    <!-- Bacteria Box -->
     <div class="bb" id="bac">
         <div class="t">🦠 Bacteria Detected</div>
         <div class="n" id="bacN">--</div>
     </div>
     
-    <!-- Trend Box -->
     <div class="tb" id="trendBox">
         <span id="trendIcon">📈</span>
         <span id="trendText">Analyzing...</span>
     </div>
     
-    <!-- Tips Box -->
     <div class="tips" id="tipsBox">
         <div class="tips-title">💡 Care Tips</div>
         <ul id="tipsList"></ul>
     </div>
     
-    <!-- Message -->
     <div class="ms" id="msg">Connect to begin...</div>
     
-    <!-- Step & Countdown -->
     <div class="sp" id="step"></div>
     <div class="cd" id="cd"></div>
     
-    <!-- Main Buttons -->
     <div class="bg">
         <button class="bc" id="conn">🔗 Connect</button>
         <button onclick="showSetup()" disabled id="btnSetup">🩹 Wound Setup</button>
@@ -219,7 +231,6 @@
         <button class="bt" onclick="cmd('stop')" disabled>⏹️ Stop</button>
     </div>
     
-    <!-- ML Training -->
     <div class="sec">
         <div class="sec-t">🧠 Train AI</div>
         <div class="bg3">
@@ -229,7 +240,6 @@
         </div>
     </div>
     
-    <!-- Data -->
     <div class="sec">
         <div class="sec-t">📊 Data</div>
         <div class="bg4">
@@ -240,18 +250,16 @@
         </div>
     </div>
     
-    <!-- Metrics -->
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">--</span></div>
         <div class="mr"><span class="ml">UV</span><span id="uv">--</span></div>
         <div class="mr"><span class="ml">Temp</span><span id="temp">--</span></div>
     </div>
     
-    <div class="ft">SentiWound v5.0 • Wound Profiles</div>
+    <div class="ft">SentiWound v5.5 • Predictive Forecasting</div>
 </div>
 
 <script>
-// Constants
 const ICONS = {HEALTHY:'💚', WATCH:'🔵', CONCERN:'⚠️', ALERT:'🚨', READY:'⏳'};
 const COLORS = {HEALTHY:'#4CAF50', WATCH:'#2196F3', CONCERN:'#FF9800', ALERT:'#F44336', READY:'#9E9E9E'};
 const STAGE = {
@@ -260,39 +268,17 @@ const STAGE = {
     SEV: {icon:'🔴', name:'SEVERE', action:'Seek emergency care NOW'}
 };
 const WOUNDS = {
-    cut: {
-        icon:'🔪', 
-        name:'Cut/Scrape',
-        tips:['Keep clean and dry', 'Change bandage daily', 'Watch for increasing redness']
-    },
-    burn: {
-        icon:'🔥', 
-        name:'Burn',
-        tips:['Keep wound moist', 'Watch for fluid buildup', 'Avoid popping blisters']
-    },
-    surgical: {
-        icon:'✂️', 
-        name:'Surgical',
-        tips:['Watch for redness around incision', 'Report any drainage to doctor', 'Avoid stretching the area']
-    },
-    chronic: {
-        icon:'🦶', 
-        name:'Chronic/Ulcer',
-        tips:['Monitor daily for changes', 'Ensure good circulation', 'Keep pressure off wound']
-    },
-    unknown: {
-        icon:'🩹', 
-        name:'General Wound',
-        tips:['Keep clean and covered', 'Monitor for infection signs', 'Seek help if worsening']
-    }
+    cut: {icon:'🔪', name:'Cut/Scrape', tips:['Keep clean and dry', 'Change bandage daily', 'Watch for increasing redness']},
+    burn: {icon:'🔥', name:'Burn', tips:['Keep wound moist', 'Watch for fluid buildup', 'Avoid popping blisters']},
+    surgical: {icon:'✂️', name:'Surgical', tips:['Watch for redness around incision', 'Report any drainage', 'Avoid stretching the area']},
+    chronic: {icon:'🦶', name:'Chronic/Ulcer', tips:['Monitor daily for changes', 'Ensure good circulation', 'Keep pressure off wound']},
+    unknown: {icon:'🩹', name:'General Wound', tips:['Keep clean and covered', 'Monitor for infection signs', 'Seek help if worsening']}
 };
 
-// State
 let dev, cmdC, datC, lastS = '';
 let selectedWound = null;
 let currentWoundType = null;
 
-// BLE Connection
 document.getElementById('conn').onclick = async () => {
     try {
         dev = await navigator.bluetooth.requestDevice({
@@ -347,14 +333,9 @@ async function lbl(t) {
     }, 200);
 }
 
-// Wound Setup
 function showSetup() {
     const panel = document.getElementById('setupPanel');
-    if (panel.classList.contains('show')) {
-        panel.classList.remove('show');
-    } else {
-        panel.classList.add('show');
-    }
+    panel.classList.toggle('show');
 }
 
 function selectWound(type) {
@@ -362,8 +343,7 @@ function selectWound(type) {
     document.querySelectorAll('.setup-btn').forEach(b => b.classList.remove('selected'));
     const buttons = document.querySelectorAll('.setup-btn');
     buttons.forEach(btn => {
-        if (btn.textContent.toLowerCase().includes(type) || 
-            (type === 'cut' && btn.textContent.includes('Cut')) ||
+        if ((type === 'cut' && btn.textContent.includes('Cut')) ||
             (type === 'burn' && btn.textContent.includes('Burn')) ||
             (type === 'surgical' && btn.textContent.includes('Surgical')) ||
             (type === 'chronic' && btn.textContent.includes('Chronic'))) {
@@ -379,25 +359,17 @@ async function confirmWoundSetup() {
         return;
     }
     const days = parseInt(document.getElementById('daysAgo').value) || 0;
-    
     document.getElementById('msg').textContent = 'Setting up...';
-    
     await cmd('wound_' + selectedWound);
-    
     if (days > 0) {
         await new Promise(r => setTimeout(r, 300));
         await cmd('days_' + days);
     }
-    
     document.getElementById('setupPanel').classList.remove('show');
-    
-    // Update header immediately
     const w = WOUNDS[selectedWound];
     document.getElementById('woundType').textContent = w.icon + ' ' + w.name;
     document.getElementById('woundDay').textContent = 'Day ' + (days + 1) + ' of ~10';
     document.getElementById('woundHeader').classList.add('show');
-    
-    // Show tips immediately
     currentWoundType = selectedWound;
     showTips(selectedWound);
 }
@@ -435,11 +407,8 @@ function upd(d) {
         if (d.wt && WOUNDS[d.wt]) {
             const w = WOUNDS[d.wt];
             document.getElementById('woundType').textContent = w.icon + ' ' + w.name;
-            document.getElementById('woundDay').textContent = 
-                'Day ' + (d.wd || 1) + ' of ~' + (d.wm || 10);
+            document.getElementById('woundDay').textContent = 'Day ' + (d.wd || 1) + ' of ~' + (d.wm || 10);
             wh.classList.add('show');
-            
-            // Update tips when wound type changes
             if (d.wt !== currentWoundType) {
                 currentWoundType = d.wt;
                 showTips(d.wt);
@@ -475,20 +444,62 @@ function upd(d) {
         warn.classList.remove('show');
     }
     
+    // PREDICTION BOX - NEW
+    const predBox = document.getElementById('predBox');
+    if (d.pd) {
+        predBox.classList.add('show');
+        
+        // Direction
+        const predDir = document.getElementById('predDir');
+        const dirIcons = {WORSENING: '📈 WORSENING', IMPROVING: '📉 IMPROVING', STABLE: '➡️ STABLE'};
+        predDir.textContent = dirIcons[d.pd] || d.pd;
+        predDir.className = 'pred-dir ' + d.pd;
+        
+        // 6 hour forecast
+        if (d.p6) {
+            document.getElementById('pred6').className = 'pred-item ' + d.p6;
+            document.getElementById('pred6st').textContent = d.p6;
+            document.getElementById('pred6c').textContent = (d.p6c || 0) + '% conf';
+        }
+        
+        // 12 hour forecast
+        if (d.p12) {
+            document.getElementById('pred12').className = 'pred-item ' + d.p12;
+            document.getElementById('pred12st').textContent = d.p12;
+            document.getElementById('pred12c').textContent = (d.p12c || 0) + '% conf';
+        }
+        
+        // 24 hour forecast
+        if (d.p24) {
+            document.getElementById('pred24').className = 'pred-item ' + d.p24;
+            document.getElementById('pred24st').textContent = d.p24;
+            document.getElementById('pred24c').textContent = (d.p24c || 0) + '% conf';
+        }
+        
+        // Intervention warning
+        const predWarn = document.getElementById('predWarn');
+        if (d.pi === 1 && d.pa) {
+            document.getElementById('predHours').textContent = d.pa;
+            predWarn.style.display = 'block';
+        } else {
+            predWarn.style.display = 'none';
+        }
+    } else {
+        predBox.classList.remove('show');
+    }
+    
     // Healing Score
     if (d.hs !== undefined) {
         const h = document.getElementById('hs');
         h.textContent = d.hs + '%';
         h.style.color = d.hs >= 70 ? '#4caf50' : d.hs >= 40 ? '#ffeb3b' : '#ff5722';
-        
-        // Update progress bar
         const progFill = document.getElementById('progFill');
         progFill.style.width = d.hs + '%';
         progFill.style.background = d.hs >= 70 ? '#4CAF50' : d.hs >= 40 ? '#FF9800' : '#F44336';
         document.getElementById('progPct').textContent = d.hs + '%';
     }
     
-    // Expected progress marker
+    // Expected progress
     if (d.ex !== undefined) {
         document.getElementById('progExpected').style.left = d.ex + '%';
         const progText = document.getElementById('progText');
