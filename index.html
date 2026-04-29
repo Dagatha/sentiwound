@@ -64,6 +64,13 @@
         .tb.show{display:block}
         .tb.IMPROVING{background:rgba(76,175,80,0.3)}.tb.WORSENING{background:rgba(244,67,54,0.3)}.tb.STABLE{background:rgba(255,255,255,0.1)}
         
+        /* Tips Box */
+        .tips{background:linear-gradient(135deg,rgba(0,150,136,0.3),rgba(0,121,107,0.3));border-radius:10px;padding:12px;margin-bottom:12px;display:none}
+        .tips.show{display:block}
+        .tips-title{font-size:13px;font-weight:700;margin-bottom:8px}
+        .tips ul{margin:0;padding-left:20px}
+        .tips li{font-size:12px;margin:6px 0;opacity:0.9;line-height:1.4}
+        
         /* Message */
         .ms{background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center;margin-bottom:12px;font-size:13px;min-height:42px}
         
@@ -187,6 +194,12 @@
         <span id="trendText">Analyzing...</span>
     </div>
     
+    <!-- Tips Box -->
+    <div class="tips" id="tipsBox">
+        <div class="tips-title">💡 Care Tips</div>
+        <ul id="tipsList"></ul>
+    </div>
+    
     <!-- Message -->
     <div class="ms" id="msg">Connect to begin...</div>
     
@@ -247,16 +260,37 @@ const STAGE = {
     SEV: {icon:'🔴', name:'SEVERE', action:'Seek emergency care NOW'}
 };
 const WOUNDS = {
-    cut: {icon:'🔪', name:'Cut/Scrape'},
-    burn: {icon:'🔥', name:'Burn'},
-    surgical: {icon:'✂️', name:'Surgical'},
-    chronic: {icon:'🦶', name:'Chronic/Ulcer'},
-    unknown: {icon:'🩹', name:'General Wound'}
+    cut: {
+        icon:'🔪', 
+        name:'Cut/Scrape',
+        tips:['Keep clean and dry', 'Change bandage daily', 'Watch for increasing redness']
+    },
+    burn: {
+        icon:'🔥', 
+        name:'Burn',
+        tips:['Keep wound moist', 'Watch for fluid buildup', 'Avoid popping blisters']
+    },
+    surgical: {
+        icon:'✂️', 
+        name:'Surgical',
+        tips:['Watch for redness around incision', 'Report any drainage to doctor', 'Avoid stretching the area']
+    },
+    chronic: {
+        icon:'🦶', 
+        name:'Chronic/Ulcer',
+        tips:['Monitor daily for changes', 'Ensure good circulation', 'Keep pressure off wound']
+    },
+    unknown: {
+        icon:'🩹', 
+        name:'General Wound',
+        tips:['Keep clean and covered', 'Monitor for infection signs', 'Seek help if worsening']
+    }
 };
 
 // State
 let dev, cmdC, datC, lastS = '';
 let selectedWound = null;
+let currentWoundType = null;
 
 // BLE Connection
 document.getElementById('conn').onclick = async () => {
@@ -313,7 +347,7 @@ async function lbl(t) {
     }, 200);
 }
 
-// Wound Setup - FIXED
+// Wound Setup
 function showSetup() {
     const panel = document.getElementById('setupPanel');
     if (panel.classList.contains('show')) {
@@ -325,9 +359,7 @@ function showSetup() {
 
 function selectWound(type) {
     selectedWound = type;
-    // Clear all selections
     document.querySelectorAll('.setup-btn').forEach(b => b.classList.remove('selected'));
-    // Find and highlight the clicked button
     const buttons = document.querySelectorAll('.setup-btn');
     buttons.forEach(btn => {
         if (btn.textContent.toLowerCase().includes(type) || 
@@ -350,16 +382,13 @@ async function confirmWoundSetup() {
     
     document.getElementById('msg').textContent = 'Setting up...';
     
-    // Send wound type
     await cmd('wound_' + selectedWound);
     
-    // Send days if > 0
     if (days > 0) {
         await new Promise(r => setTimeout(r, 300));
         await cmd('days_' + days);
     }
     
-    // Hide panel
     document.getElementById('setupPanel').classList.remove('show');
     
     // Update header immediately
@@ -367,6 +396,22 @@ async function confirmWoundSetup() {
     document.getElementById('woundType').textContent = w.icon + ' ' + w.name;
     document.getElementById('woundDay').textContent = 'Day ' + (days + 1) + ' of ~10';
     document.getElementById('woundHeader').classList.add('show');
+    
+    // Show tips immediately
+    currentWoundType = selectedWound;
+    showTips(selectedWound);
+}
+
+function showTips(woundType) {
+    if (woundType && WOUNDS[woundType]) {
+        const tips = WOUNDS[woundType].tips;
+        const tipsBox = document.getElementById('tipsBox');
+        const tipsList = document.getElementById('tipsList');
+        tipsList.innerHTML = tips.map(t => '<li>' + t + '</li>').join('');
+        tipsBox.classList.add('show');
+    } else {
+        document.getElementById('tipsBox').classList.remove('show');
+    }
 }
 
 function playAlert() {
@@ -393,8 +438,15 @@ function upd(d) {
             document.getElementById('woundDay').textContent = 
                 'Day ' + (d.wd || 1) + ' of ~' + (d.wm || 10);
             wh.classList.add('show');
+            
+            // Update tips when wound type changes
+            if (d.wt !== currentWoundType) {
+                currentWoundType = d.wt;
+                showTips(d.wt);
+            }
         } else {
             wh.classList.remove('show');
+            document.getElementById('tipsBox').classList.remove('show');
         }
     }
     
