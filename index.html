@@ -18,8 +18,9 @@
         .sb.sel{background:#4CAF50;font-weight:700}.sb .i{font-size:20px;display:block;margin-bottom:4px}
         .dr{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px}
         .dr input{width:50px;padding:6px;border-radius:6px;border:none;text-align:center}
-        .sc{background:#9E9E9E;border-radius:14px;padding:16px;text-align:center;margin-bottom:10px}
-        .sc .i{font-size:36px}.sc .s{font-size:20px;font-weight:700;margin:6px 0}.sc .n{font-size:36px;font-weight:700}.sc .l{font-size:10px;opacity:.8}
+        .sc{border-radius:14px;padding:20px;text-align:center;margin-bottom:10px}
+        .sc .i{font-size:48px}.sc .s{font-size:24px;font-weight:700;margin:8px 0}
+        .sc .desc{font-size:12px;opacity:0.9}
         .warn{background:#f44336;border-radius:8px;padding:12px;margin-bottom:10px;text-align:center;font-weight:700;font-size:13px;display:none;animation:pulse 1s infinite}
         .warn.show{display:block}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
@@ -30,6 +31,8 @@
         .clin-item .mark{width:20px}.clin-item.met .mark{color:#4CAF50}.clin-item.unmet .mark{color:#f44336;opacity:0.5}
         .clin-item.unmet .name{opacity:0.5}
         .clin-sum{text-align:center;margin-top:8px;font-size:13px;font-weight:700}
+        .bb{background:linear-gradient(135deg,#7b1fa2,#4a148c);border-radius:10px;padding:12px;margin-bottom:10px;text-align:center;display:none}
+        .bb.show{display:block}.bb .t{font-size:11px;opacity:.8;margin-bottom:4px}.bb .n{font-size:18px;font-weight:700}
         .pred{background:linear-gradient(135deg,#6a1b9a,#4a148c);border-radius:10px;padding:12px;margin-bottom:10px;display:none}
         .pred.show{display:block}.pred-t{font-size:12px;text-align:center;margin-bottom:8px}
         .pred-d{text-align:center;font-size:14px;font-weight:700;margin-bottom:8px}
@@ -46,11 +49,9 @@
         .prog-b{height:10px;background:rgba(255,255,255,0.2);border-radius:5px;overflow:hidden;position:relative}
         .prog-f{height:100%;border-radius:5px;transition:width 0.3s}
         .prog-e{position:absolute;top:0;height:100%;width:2px;background:#fff;opacity:0.7}
-        .bb{background:linear-gradient(135deg,#7b1fa2,#4a148c);border-radius:8px;padding:10px;margin-bottom:10px;text-align:center;display:none}
-        .bb.show{display:block}.bb .t{font-size:10px;opacity:.8}.bb .n{font-size:14px;font-weight:700}
         .tb{border-radius:8px;padding:8px;margin-bottom:10px;text-align:center;display:none;font-size:12px}
         .tb.show{display:block}.tb.IMPROVING{background:rgba(76,175,80,0.3)}.tb.WORSENING{background:rgba(244,67,54,0.3)}.tb.STABLE{background:rgba(255,255,255,0.1)}
-        .ms{background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px;font-size:12px}
+        .ms{background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;margin-bottom:10px;font-size:12px;min-height:38px}
         .sp{background:linear-gradient(135deg,#FF9800,#F57C00);color:#000;border-radius:8px;padding:10px;text-align:center;margin-bottom:8px;font-weight:600;font-size:12px;display:none}
         .sp.show{display:block}
         .cd{background:rgba(255,152,0,.3);border-radius:50%;width:60px;height:60px;display:none;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 10px}
@@ -72,7 +73,7 @@
 </head>
 <body>
 <div class="c">
-    <h1>🩹 SentiWound v6.0</h1>
+    <h1>🩹 SentiWound</h1>
     
     <div class="wh" id="wh"><div class="wt" id="wt">🩹 General</div><div class="wd" id="wdd">Day 1</div></div>
     
@@ -85,35 +86,39 @@
             <button class="sb" onclick="selW('chronic')"><span class="i">🦶</span>Chronic</button>
         </div>
         <div class="dr"><label>Days ago:</label><input type="number" id="daysAgo" value="0" min="0" max="60"></div>
-        <button class="sb" style="width:100%;margin-top:10px;background:#4CAF50" onclick="confirmW()">✓ Start</button>
+        <button class="sb" style="width:100%;margin-top:10px;background:#4CAF50" onclick="confirmW()">✓ Start Tracking</button>
     </div>
     
-    <div class="sc" id="sc">
+    <div class="sc" id="sc" style="background:#9E9E9E">
         <div class="i" id="icon">⏳</div>
         <div class="s" id="status">READY</div>
-        <div class="n" id="score">0</div>
-        <div class="l">Risk Score</div>
+        <div class="desc" id="desc">Connect to begin</div>
     </div>
     
     <div class="warn" id="warn">🚨 SEEK MEDICAL ATTENTION</div>
     
+    <div class="bb" id="bb">
+        <div class="t">🦠 BACTERIA DETECTED</div>
+        <div class="n" id="bac">--</div>
+    </div>
+    
     <div class="clin" id="clin">
         <div class="clin-title">📋 Clinical Criteria (CDC-Based)</div>
-        <div class="clin-item" id="cr1"><span class="mark">✗</span><span class="name">Elevated Temperature</span><span class="val">--</span></div>
-        <div class="clin-item" id="cr2"><span class="mark">✗</span><span class="name">Bacterial Fluorescence</span><span class="val">--</span></div>
-        <div class="clin-item" id="cr3"><span class="mark">✗</span><span class="name">Bacteria Identified</span><span class="val">--</span></div>
-        <div class="clin-sum"><span id="cm">0</span>/<span id="ctot">3</span> criteria met → <span id="cres">Monitoring</span></div>
+        <div class="clin-item unmet" id="cr1"><span class="mark">✗</span><span class="name">Elevated Temperature</span><span class="val">--</span></div>
+        <div class="clin-item unmet" id="cr2"><span class="mark">✗</span><span class="name">Bacterial Fluorescence</span><span class="val">--</span></div>
+        <div class="clin-item unmet" id="cr3"><span class="mark">✗</span><span class="name">Bacteria Identified</span><span class="val">--</span></div>
+        <div class="clin-sum"><span id="cm">0</span>/<span id="ctot">3</span> criteria → <span id="cres">Monitoring</span></div>
     </div>
     
     <div class="pred" id="pred">
-        <div class="pred-t">🔮 Infection Forecast</div>
+        <div class="pred-t">🔮 Forecast</div>
         <div class="pred-d" id="pdir">STABLE</div>
         <div class="pred-g">
             <div class="pred-i" id="p6"><div class="t">+6h</div><div class="v" id="p6v">--</div></div>
             <div class="pred-i" id="p12"><div class="t">+12h</div><div class="v" id="p12v">--</div></div>
             <div class="pred-i" id="p24"><div class="t">+24h</div><div class="v" id="p24v">--</div></div>
         </div>
-        <div class="pred-w" id="pwarn">⚠️ ALERT in <span id="phrs">--</span>h!</div>
+        <div class="pred-w" id="pwarn">⚠️ ALERT in <span id="phrs">--</span>h - ACT NOW</div>
     </div>
     
     <div class="hc">
@@ -122,11 +127,10 @@
     </div>
     
     <div class="prog">
-        <div class="prog-l"><span>Progress</span><span id="pPct">0%</span></div>
+        <div class="prog-l"><span>Healing Progress</span><span id="pPct">0%</span></div>
         <div class="prog-b"><div class="prog-f" id="pFill" style="width:0%"></div><div class="prog-e" id="pExp" style="left:0%"></div></div>
     </div>
     
-    <div class="bb" id="bb"><div class="t">🦠 Bacteria</div><div class="n" id="bac">--</div></div>
     <div class="tb" id="tb"><span id="trico">➡️</span> <span id="trtxt">Stable</span></div>
     
     <div class="ms" id="msg">Connect to begin...</div>
@@ -135,17 +139,17 @@
     
     <div class="bg">
         <button class="bc" id="conn">🔗 Connect</button>
-        <button onclick="showSetup()">🩹 Setup</button>
-        <button onclick="cmd('auto_calibrate')" disabled>📐 Calibrate</button>
+        <button onclick="showSetup()" disabled>🩹 Setup</button>
+        <button onclick="cmd('auto_calibrate')" disabled>📐 Auto Cal</button>
         <button onclick="cmd('single')" disabled>📷 Single</button>
-        <button onclick="cmd('quick_demo')" disabled>🎬 Quick</button>
-        <button onclick="cmd('extended_demo')" disabled>🎭 Full</button>
+        <button onclick="cmd('quick_demo')" disabled>🎬 Quick Demo</button>
+        <button onclick="cmd('extended_demo')" disabled>🎭 Full Demo</button>
         <button class="bs" onclick="cmd('start')" disabled>▶️ Monitor</button>
         <button class="bt" onclick="cmd('stop')" disabled>⏹️ Stop</button>
     </div>
     
     <div class="sec">
-        <div class="sec-t">🧠 Label Last Reading (Train AI)</div>
+        <div class="sec-t">🧠 Label Last Reading (Improves Accuracy)</div>
         <div class="bg3">
             <button class="bh bsm" onclick="cmd('label_healthy')" disabled>✓ Healthy</button>
             <button class="bi bsm" onclick="cmd('label_infected')" disabled>✗ Infected</button>
@@ -164,14 +168,14 @@
     </div>
     
     <div class="sec">
-        <div class="sec-t">📄 Report</div>
-        <button class="rpt" onclick="genReport()" disabled>📄 Generate Medical Report</button>
+        <div class="sec-t">📄 Medical Report</div>
+        <button class="rpt" onclick="genReport()" disabled>📄 Generate Report for Doctor</button>
     </div>
     
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">--</span></div>
-        <div class="mr"><span class="ml">UV</span><span id="uv">--</span></div>
-        <div class="mr"><span class="ml">Temp</span><span id="temp">--</span></div>
+        <div class="mr"><span class="ml">UV Reading</span><span id="uv">--</span></div>
+        <div class="mr"><span class="ml">Temp Delta</span><span id="temp">--</span></div>
     </div>
     
     <div class="ft">SentiWound v6.0 • Clinical Validation</div>
@@ -180,6 +184,7 @@
 <script>
 const ICO={HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'⏳'};
 const COL={HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9E9E9E'};
+const DESC={HEALTHY:'No signs of infection',WATCH:'Monitor closely',CONCERN:'See doctor within 24h',ALERT:'Seek immediate care',READY:'Ready to scan'};
 const CRES={0:'No infection signs',1:'Monitor closely',2:'Infection likely',3:'Infection confirmed'};
 let dev,cmdC,datC,lastS='',selWound=null;
 
@@ -195,7 +200,7 @@ document.getElementById('conn').onclick=async()=>{
         datC.addEventListener('characteristicvaluechanged',onD);
         document.querySelectorAll('button').forEach(b=>b.disabled=false);
         document.getElementById('conn').textContent='✅ Connected';
-        document.getElementById('msg').textContent='Ready!';
+        document.getElementById('msg').textContent='Ready! Tap Setup to configure wound.';
         cmd('get_wound');
     }catch(e){document.getElementById('msg').textContent='Connection failed';}
 };
@@ -204,7 +209,7 @@ function disc(){
     document.querySelectorAll('button').forEach(b=>b.disabled=true);
     document.getElementById('conn').disabled=false;
     document.getElementById('conn').textContent='🔗 Connect';
-    document.getElementById('msg').textContent='Disconnected';
+    document.getElementById('msg').textContent='Disconnected - tap Connect';
 }
 
 function onD(e){try{upd(JSON.parse(new TextDecoder().decode(e.target.value)));}catch(er){}}
@@ -213,7 +218,7 @@ async function cmd(c){if(cmdC)try{await cmdC.writeValue(new TextEncoder().encode
 function showSetup(){document.getElementById('setup').classList.toggle('show');}
 function selW(t){selWound=t;document.querySelectorAll('.sg .sb').forEach(b=>b.classList.remove('sel'));event.target.closest('.sb').classList.add('sel');}
 async function confirmW(){
-    if(!selWound){document.getElementById('msg').textContent='Select wound type';return;}
+    if(!selWound){document.getElementById('msg').textContent='Select a wound type first';return;}
     const d=parseInt(document.getElementById('daysAgo').value)||0;
     await cmd('wound_'+selWound);
     if(d>0){await new Promise(r=>setTimeout(r,200));await cmd('days_'+d);}
@@ -224,22 +229,25 @@ function playAlert(){try{const c=new(window.AudioContext||window.webkitAudioCont
 function speak(m){if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(m);u.rate=0.9;speechSynthesis.speak(u);}}
 
 function upd(d){
-    // Status
     if(d.st){
         document.getElementById('status').textContent=d.st;
         document.getElementById('icon').textContent=ICO[d.st]||'❓';
         document.getElementById('sc').style.background=COL[d.st]||'#9E9E9E';
+        document.getElementById('desc').textContent=DESC[d.st]||'';
         if(d.st==='ALERT'&&lastS!=='ALERT'){playAlert();speak('Warning. Infection detected. Seek medical attention.');}
-        else if(d.st==='CONCERN'&&lastS!=='CONCERN'){speak('Caution. Elevated infection risk.');}
+        else if(d.st==='CONCERN'&&lastS!=='CONCERN'){speak('Caution. Elevated infection risk detected.');}
         lastS=d.st;
     }
-    if(d.sc!==undefined)document.getElementById('score').textContent=Math.round(d.sc);
     
-    // Warning
     const w=document.getElementById('warn');
-    if(d.st==='ALERT'){w.textContent='🚨 SEEK MEDICAL ATTENTION';w.classList.add('show');}
-    else if(d.st==='CONCERN'){w.textContent='⚠️ See doctor within 24h';w.style.background='#ff9800';w.classList.add('show');}
+    if(d.st==='ALERT'){w.textContent='🚨 SEEK MEDICAL ATTENTION';w.style.background='#f44336';w.classList.add('show');}
+    else if(d.st==='CONCERN'){w.textContent='⚠️ Schedule doctor visit within 24 hours';w.style.background='#ff9800';w.classList.add('show');}
     else{w.classList.remove('show');}
+    
+    // Bacteria display
+    const bb=document.getElementById('bb');
+    if(d.ba){document.getElementById('bac').textContent=d.ba;bb.classList.add('show');}
+    else{bb.classList.remove('show');}
     
     // Clinical criteria
     if(d.c1!==undefined){
@@ -247,23 +255,27 @@ function upd(d){
         cr1.className='clin-item '+(d.c1?'met':'unmet');
         cr1.querySelector('.mark').textContent=d.c1?'✓':'✗';
     }
+    if(d.td!==undefined)document.getElementById('cr1').querySelector('.val').textContent='Δ'+d.td+'°C';
+    
     if(d.c2!==undefined){
         const cr2=document.getElementById('cr2');
         cr2.className='clin-item '+(d.c2?'met':'unmet');
         cr2.querySelector('.mark').textContent=d.c2?'✓':'✗';
-        if(d.rt)cr2.querySelector('.val').textContent=d.rt.toFixed(2)+'x';
     }
+    if(d.rt!==undefined)document.getElementById('cr2').querySelector('.val').textContent=d.rt.toFixed(2)+'x';
+    
     if(d.c3!==undefined){
         const cr3=document.getElementById('cr3');
         cr3.className='clin-item '+(d.c3?'met':'unmet');
         cr3.querySelector('.mark').textContent=d.c3?'✓':'✗';
         if(d.ba)cr3.querySelector('.val').textContent=d.ba;
+        else if(!d.c3)cr3.querySelector('.val').textContent='None';
     }
+    
     if(d.cm!==undefined){
         document.getElementById('cm').textContent=d.cm;
         document.getElementById('cres').textContent=CRES[d.cm]||'Unknown';
     }
-    if(d.tp)document.getElementById('cr1').querySelector('.val').textContent='Δ'+d.tp.toFixed(1)+'°C';
     
     // Wound header
     if(d.wt){
@@ -271,6 +283,8 @@ function upd(d){
         document.getElementById('wt').textContent=(icons[d.wt]||'🩹')+' '+d.wt.charAt(0).toUpperCase()+d.wt.slice(1);
         document.getElementById('wdd').textContent='Day '+(d.wd||1)+' of ~'+(d.wm||10);
         document.getElementById('wh').classList.add('show');
+    }else if(d.wt===null){
+        document.getElementById('wh').classList.remove('show');
     }
     
     // Prediction
@@ -296,12 +310,8 @@ function upd(d){
     if(d.ex!==undefined)document.getElementById('pExp').style.left=d.ex+'%';
     if(d.dy!==undefined)document.getElementById('days').textContent=d.dy<0?'⚠️':d.dy===0?'✓':d.dy+'d';
     
-    // Bacteria
-    if(d.ba){document.getElementById('bac').textContent=d.ba;document.getElementById('bb').classList.add('show');}
-    else{document.getElementById('bb').classList.remove('show');}
-    
     // Trend
-    if(d.tr){
+    if(d.tr&&d.tr!=='INSUFFICIENT'){
         const tb=document.getElementById('tb');
         tb.className='tb show '+d.tr;
         document.getElementById('trico').textContent=d.tr==='IMPROVING'?'📉':d.tr==='WORSENING'?'📈':'➡️';
@@ -316,13 +326,13 @@ function upd(d){
     // Metrics
     if(d.rt!==undefined)document.getElementById('ratio').textContent=d.rt.toFixed(2)+'x';
     if(d.uo!==undefined&&d.un!==undefined)document.getElementById('uv').textContent=d.uo+'→'+d.un;
-    if(d.tp)document.getElementById('temp').textContent=d.tp.toFixed(1)+'°C';
+    if(d.td!==undefined)document.getElementById('temp').textContent='Δ'+d.td+'°C';
 }
 
 function genReport(){
     const now=new Date();
     const status=document.getElementById('status').textContent;
-    const score=document.getElementById('score').textContent;
+    const desc=document.getElementById('desc').textContent;
     const wound=document.getElementById('wt').textContent;
     const wday=document.getElementById('wdd').textContent;
     const hs=document.getElementById('hs').textContent;
@@ -337,49 +347,67 @@ function genReport(){
     const p12=document.getElementById('p12v').textContent;
     const p24=document.getElementById('p24v').textContent;
     
+    const c1=document.getElementById('cr1').classList.contains('met')?'✓':'✗';
+    const c2=document.getElementById('cr2').classList.contains('met')?'✓':'✗';
+    const c3=document.getElementById('cr3').classList.contains('met')?'✓':'✗';
+    const c1v=document.getElementById('cr1').querySelector('.val').textContent;
+    const c2v=document.getElementById('cr2').querySelector('.val').textContent;
+    const c3v=document.getElementById('cr3').querySelector('.val').textContent;
+    
     let rec='';
-    if(status==='ALERT')rec='⚠️ IMMEDIATE medical attention required.';
+    if(status==='ALERT')rec='⚠️ IMMEDIATE medical attention recommended.';
     else if(status==='CONCERN')rec='Schedule doctor visit within 24 hours.';
-    else if(status==='WATCH')rec='Continue monitoring. Maintain wound care.';
-    else rec='Wound healing normally. Continue current care.';
+    else if(status==='WATCH')rec='Continue monitoring. Maintain proper wound care.';
+    else rec='Wound healing normally. Continue current care routine.';
 
     const rpt=`
-════════════════════════════════════════════════════
-         SENTIWOUND MEDICAL REPORT
-════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════
+              SENTIWOUND CLINICAL ASSESSMENT
+════════════════════════════════════════════════════════════
 Generated: ${now.toLocaleString()}
 
-─── WOUND PROFILE ──────────────────────────────────
-Type:     ${wound}
-Period:   ${wday}
+─── WOUND PROFILE ──────────────────────────────────────────
+Type:           ${wound}
+Tracking:       ${wday}
 
-─── CLINICAL ASSESSMENT ────────────────────────────
-Status:      ${status}
-Risk Score:  ${score}/100
-Criteria:    ${cm}/3 met → ${cres}
+─── ASSESSMENT RESULT ──────────────────────────────────────
+Status:         ${status}
+                ${desc}
 
-Healing:     ${hs}
-Days Left:   ${days}
-Trend:       ${trend}
+─── CLINICAL CRITERIA (CDC-Based) ──────────────────────────
+${c1} Elevated Temperature    ${c1v}
+${c2} Bacterial Fluorescence  ${c2v}
+${c3} Bacteria Identified     ${c3v}
 
-─── SENSOR DATA ────────────────────────────────────
-Fluorescence: ${ratio}
-Temperature:  ${temp}
-Bacteria:     ${bac||'None detected'}
+Result: ${cm}/3 criteria met → ${cres}
 
-─── FORECAST ───────────────────────────────────────
-+6 hours:    ${p6}
-+12 hours:   ${p12}
-+24 hours:   ${p24}
+─── HEALING METRICS ────────────────────────────────────────
+Healing Score:  ${hs}
+Days Remaining: ${days}
+Trend:          ${trend}
+${bac!=='--'?'Bacteria:       '+bac:''}
 
-─── RECOMMENDATION ─────────────────────────────────
+─── PREDICTIVE FORECAST ────────────────────────────────────
++6 hours:       ${p6}
++12 hours:      ${p12}
++24 hours:      ${p24}
+
+─── RECOMMENDATION ─────────────────────────────────────────
 ${rec}
 
-════════════════════════════════════════════════════
-DISCLAIMER: For informational purposes only.
-Always consult a healthcare professional.
-Device: SentiWound v6.0 | Method: UV Fluorescence
-════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════
+                       DISCLAIMER
+════════════════════════════════════════════════════════════
+This report is generated by SentiWound, an experimental 
+wound monitoring device using UV fluorescence analysis.
+
+FOR INFORMATIONAL PURPOSES ONLY. This is NOT a medical 
+diagnosis. Always consult a qualified healthcare 
+professional for medical advice and treatment decisions.
+
+Device: SentiWound v6.0
+Method: UV Fluorescence + CDC Clinical Criteria
+════════════════════════════════════════════════════════════
 `;
     const blob=new Blob([rpt],{type:'text/plain'});
     const a=document.createElement('a');
