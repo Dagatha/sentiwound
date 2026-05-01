@@ -68,6 +68,9 @@
         .mt{background:rgba(255,255,255,.08);border-radius:8px;padding:8px;font-size:11px}
         .mr{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.1)}
         .mr:last-child{border:none}.ml{opacity:.6}
+        .cal-status{background:rgba(255,193,7,0.2);border-radius:8px;padding:8px;margin-bottom:10px;text-align:center;font-size:11px;display:none}
+        .cal-status.show{display:block}
+        .cal-status.calibrated{background:rgba(76,175,80,0.2)}
         .ft{text-align:center;font-size:9px;opacity:.4;margin-top:12px}
     </style>
 </head>
@@ -76,6 +79,8 @@
     <h1>🩹 SentiWound</h1>
     
     <div class="wh" id="wh"><div class="wt" id="wt">🩹 General</div><div class="wd" id="wdd">Day 1</div></div>
+    
+    <div class="cal-status" id="calStatus">⚠️ Not calibrated - run Auto Cal on healthy skin first</div>
     
     <div class="setup" id="setup">
         <h2>🩹 Wound Setup</h2>
@@ -107,7 +112,7 @@
         <div class="clin-item unmet" id="cr1"><span class="mark">✗</span><span class="name">Elevated Temperature</span><span class="val">--</span></div>
         <div class="clin-item unmet" id="cr2"><span class="mark">✗</span><span class="name">Bacterial Fluorescence</span><span class="val">--</span></div>
         <div class="clin-item unmet" id="cr3"><span class="mark">✗</span><span class="name">Bacteria Identified</span><span class="val">--</span></div>
-        <div class="clin-sum"><span id="cm">0</span>/<span id="ctot">3</span> criteria → <span id="cres">Monitoring</span></div>
+        <div class="clin-sum"><span id="cm">0</span>/3 criteria → <span id="cres">Monitoring</span></div>
     </div>
     
     <div class="pred" id="pred">
@@ -175,7 +180,7 @@
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">--</span></div>
         <div class="mr"><span class="ml">UV Reading</span><span id="uv">--</span></div>
-        <div class="mr"><span class="ml">Temp</span><span id="temp">--</span></div>
+        <div class="mr"><span class="ml">Current Temp</span><span id="temp">--</span></div>
         <div class="mr"><span class="ml">vs Calibrated</span><span id="tempDev">--</span></div>
     </div>
     
@@ -187,7 +192,7 @@ const ICO={HEALTHY:'💚',WATCH:'🔵',CONCERN:'⚠️',ALERT:'🚨',READY:'⏳'
 const COL={HEALTHY:'#4CAF50',WATCH:'#2196F3',CONCERN:'#FF9800',ALERT:'#F44336',READY:'#9E9E9E'};
 const DESC={HEALTHY:'No signs of infection',WATCH:'Monitor closely',CONCERN:'See doctor within 24h',ALERT:'Seek immediate care',READY:'Ready to scan'};
 const CRES={0:'No infection signs',1:'Monitor closely',2:'Infection likely',3:'Infection confirmed'};
-let dev,cmdC,datC,lastS='',selWound=null;
+let dev,cmdC,datC,lastS='',selWound=null,isCalibrated=false;
 
 document.getElementById('conn').onclick=async()=>{
     try{
@@ -201,8 +206,10 @@ document.getElementById('conn').onclick=async()=>{
         datC.addEventListener('characteristicvaluechanged',onD);
         document.querySelectorAll('button').forEach(b=>b.disabled=false);
         document.getElementById('conn').textContent='✅ Connected';
-        document.getElementById('msg').textContent='Ready! Tap Setup to configure wound.';
+        document.getElementById('msg').textContent='Ready! Run Auto Cal first, then Setup wound.';
+        document.getElementById('calStatus').classList.add('show');
         cmd('get_wound');
+        cmd('get_cal');
     }catch(e){document.getElementById('msg').textContent='Connection failed';}
 };
 
@@ -230,6 +237,15 @@ function playAlert(){try{const c=new(window.AudioContext||window.webkitAudioCont
 function speak(m){if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(m);u.rate=0.9;speechSynthesis.speak(u);}}
 
 function upd(d){
+    // Calibration status
+    if(d.ms && d.ms.includes('Cal:')){
+        isCalibrated=true;
+        const cs=document.getElementById('calStatus');
+        cs.textContent='✓ '+d.ms;
+        cs.classList.add('calibrated');
+    }
+    
+    // Status
     if(d.st){
         document.getElementById('status').textContent=d.st;
         document.getElementById('icon').textContent=ICO[d.st]||'❓';
@@ -240,6 +256,7 @@ function upd(d){
         lastS=d.st;
     }
     
+    // Warning banner
     const w=document.getElementById('warn');
     if(d.st==='ALERT'){w.textContent='🚨 SEEK MEDICAL ATTENTION';w.style.background='#f44336';w.classList.add('show');}
     else if(d.st==='CONCERN'){w.textContent='⚠️ Schedule doctor visit within 24 hours';w.style.background='#ff9800';w.classList.add('show');}
@@ -256,14 +273,18 @@ function upd(d){
         cr1.className='clin-item '+(d.c1?'met':'unmet');
         cr1.querySelector('.mark').textContent=d.c1?'✓':'✗';
     }
-    if(d.td!==undefined)document.getElementById('cr1').querySelector('.val').textContent=(d.td>=0?'+':'')+d.td.toFixed(1)+'°C vs cal';
+    if(d.td!==undefined){
+        document.getElementById('cr1').querySelector('.val').textContent=(d.td>=0?'+':'')+d.td.toFixed(1)+'°C vs cal';
+    }
     
     if(d.c2!==undefined){
         const cr2=document.getElementById('cr2');
         cr2.className='clin-item '+(d.c2?'met':'unmet');
         cr2.querySelector('.mark').textContent=d.c2?'✓':'✗';
     }
-    if(d.rt!==undefined)document.getElementById('cr2').querySelector('.val').textContent=d.rt.toFixed(2)+'x';
+    if(d.rt!==undefined){
+        document.getElementById('cr2').querySelector('.val').textContent=d.rt.toFixed(2)+'x';
+    }
     
     if(d.c3!==undefined){
         const cr3=document.getElementById('cr3');
@@ -332,7 +353,9 @@ function upd(d){
         const el=document.getElementById('tempDev');
         el.textContent=(d.td>=0?'+':'')+d.td.toFixed(1)+'°C';
         el.style.color=d.td>1.5?'#ff5252':'#69f0ae';
+    }
 }
+
 function genReport(){
     const now=new Date();
     const status=document.getElementById('status').textContent;
@@ -345,6 +368,7 @@ function genReport(){
     const bac=document.getElementById('bac').textContent;
     const ratio=document.getElementById('ratio').textContent;
     const temp=document.getElementById('temp').textContent;
+    const tempDev=document.getElementById('tempDev').textContent;
     const cm=document.getElementById('cm').textContent;
     const cres=document.getElementById('cres').textContent;
     const p6=document.getElementById('p6v').textContent;
@@ -385,6 +409,10 @@ ${c3} Bacteria Identified     ${c3v}
 
 Result: ${cm}/3 criteria met → ${cres}
 
+─── TEMPERATURE ANALYSIS ───────────────────────────────────
+Current:        ${temp}
+vs Calibrated:  ${tempDev}
+
 ─── HEALING METRICS ────────────────────────────────────────
 Healing Score:  ${hs}
 Days Remaining: ${days}
@@ -410,7 +438,7 @@ diagnosis. Always consult a qualified healthcare
 professional for medical advice and treatment decisions.
 
 Device: SentiWound v6.0
-Method: UV Fluorescence + CDC Clinical Criteria
+Method: UV Fluorescence + Calibrated Temperature Analysis
 ════════════════════════════════════════════════════════════
 `;
     const blob=new Blob([rpt],{type:'text/plain'});
