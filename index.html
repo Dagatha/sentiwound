@@ -105,6 +105,9 @@
         
         .ft{text-align:center;font-size:10px;opacity:.4;margin-top:15px}
         .dbg{background:#333;border-radius:8px;padding:8px;margin-bottom:12px;font-size:9px;font-family:monospace;word-break:break-all;max-height:60px;overflow:auto;display:none}
+        
+        .rpt{background:linear-gradient(135deg,#00897B,#00695C);border:none;border-radius:10px;padding:14px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:100%}
+        .rpt:disabled{opacity:0.4}   
     </style>
 </head>
 <body>
@@ -248,6 +251,11 @@
             <button class="bd" onclick="cmd('history_clear')" disabled>📜</button>
             <button class="bd" onclick="cmd('clear_all')" disabled>🗑️</button>
         </div>
+    </div>
+    
+    <div class="sec">
+        <div class="sec-t">📄 Medical Report</div>
+        <button class="rpt" onclick="generateReport()" disabled>📄 Generate Report for Doctor</button>
     </div>
     
     <div class="mt">
@@ -585,6 +593,125 @@ function upd(d) {
     if (d.uo !== undefined && d.un !== undefined) document.getElementById('uv').textContent = d.uo + ' → ' + d.un;
     if (d.tp) document.getElementById('temp').textContent = d.tp.toFixed(1) + '°C';
 }
+function generateReport() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+    const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+    
+    const status = document.getElementById('status').textContent || 'Unknown';
+    const score = document.getElementById('score').textContent || '0';
+    const healing = document.getElementById('hs')?.textContent || '--';
+    const days = document.getElementById('days')?.textContent || '--';
+    const trend = document.getElementById('trendText')?.textContent || 'Unknown';
+    const wound = document.getElementById('woundType')?.textContent || 'Not specified';
+    const woundDay = document.getElementById('woundDay')?.textContent || '';
+    const ratio = document.getElementById('ratio')?.textContent || '--';
+    const temp = document.getElementById('temp')?.textContent || '--';
+    const bacteria = document.getElementById('bacN')?.textContent || 'None detected';
+    
+    // Prediction data
+    const predDir = document.getElementById('predDir')?.textContent || 'Unknown';
+    const pred6 = document.getElementById('pred6st')?.textContent || '--';
+    const pred12 = document.getElementById('pred12st')?.textContent || '--';
+    const pred24 = document.getElementById('pred24st')?.textContent || '--';
+    
+    // Get recommendation based on status
+    let recommendation = '';
+    let urgency = '';
+    if (status === 'ALERT') {
+        recommendation = 'IMMEDIATE medical attention recommended. Signs of significant infection detected.';
+        urgency = '🚨 URGENT';
+    } else if (status === 'CONCERN') {
+        recommendation = 'Schedule appointment with healthcare provider within 24 hours. Elevated infection markers detected.';
+        urgency = '⚠️ HIGH PRIORITY';
+    } else if (status === 'WATCH') {
+        recommendation = 'Continue monitoring wound closely. Maintain proper wound care hygiene. Contact doctor if symptoms worsen.';
+        urgency = '👁️ MONITOR';
+    } else {
+        recommendation = 'Wound appears to be healing normally. Continue current wound care routine.';
+        urgency = '✓ ROUTINE';
+    }
+
+    const report = `
+════════════════════════════════════════════════════════════════
+                    SENTIWOUND WOUND ASSESSMENT
+                         MEDICAL REPORT
+════════════════════════════════════════════════════════════════
+
+Generated: ${dateStr} at ${timeStr}
+
+────────────────────────────────────────────────────────────────
+                      PATIENT WOUND PROFILE
+────────────────────────────────────────────────────────────────
+
+  Wound Type:        ${wound}
+  Tracking Period:   ${woundDay}
+  
+────────────────────────────────────────────────────────────────
+                      CURRENT ASSESSMENT
+────────────────────────────────────────────────────────────────
+
+  STATUS:            ${status}
+  Risk Score:        ${score}/100
+  Urgency Level:     ${urgency}
+  
+  Healing Progress:  ${healing}
+  Est. Days to Heal: ${days}
+  Healing Trend:     ${trend}
+
+────────────────────────────────────────────────────────────────
+                      SENSOR READINGS
+────────────────────────────────────────────────────────────────
+
+  UV Fluorescence:   ${ratio}
+  Temperature:       ${temp}
+  Bacterial Detection: ${bacteria}
+
+────────────────────────────────────────────────────────────────
+                      PREDICTIVE ANALYSIS
+────────────────────────────────────────────────────────────────
+
+  Current Trend:     ${predDir}
+  
+  Forecast:
+    • In 6 hours:    ${pred6}
+    • In 12 hours:   ${pred12}
+    • In 24 hours:   ${pred24}
+
+────────────────────────────────────────────────────────────────
+                      RECOMMENDATION
+────────────────────────────────────────────────────────────────
+
+  ${recommendation}
+
+════════════════════════════════════════════════════════════════
+                         DISCLAIMER
+════════════════════════════════════════════════════════════════
+
+  This report is generated by SentiWound, an experimental wound
+  monitoring device. It is intended for INFORMATIONAL PURPOSES
+  ONLY and should NOT replace professional medical diagnosis.
+  
+  Always consult a qualified healthcare professional for medical
+  advice, diagnosis, and treatment decisions.
+  
+════════════════════════════════════════════════════════════════
+`;
+
+    // Create and download file
+    const blob = new Blob([report], {type: 'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'SentiWound_Report_' + now.toISOString().slice(0,10) + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    document.getElementById('msg').textContent = '✓ Report downloaded!';
+}
+
 </script>
 </body>
 </html>
