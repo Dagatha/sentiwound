@@ -175,7 +175,8 @@
     <div class="mt">
         <div class="mr"><span class="ml">Fluorescence</span><span id="ratio">--</span></div>
         <div class="mr"><span class="ml">UV Reading</span><span id="uv">--</span></div>
-        <div class="mr"><span class="ml">Temp Delta</span><span id="temp">--</span></div>
+        <div class="mr"><span class="ml">Temp</span><span id="temp">--</span></div>
+        <div class="mr"><span class="ml">vs Calibrated</span><span id="tempDev">--</span></div>
     </div>
     
     <div class="ft">SentiWound v6.0 • Clinical Validation</div>
@@ -255,7 +256,7 @@ function upd(d){
         cr1.className='clin-item '+(d.c1?'met':'unmet');
         cr1.querySelector('.mark').textContent=d.c1?'✓':'✗';
     }
-    if(d.td!==undefined)document.getElementById('cr1').querySelector('.val').textContent='Δ'+d.td+'°C';
+    if(d.td!==undefined)document.getElementById('cr1').querySelector('.val').textContent=(d.td>=0?'+':'')+d.td.toFixed(1)+'°C vs cal';
     
     if(d.c2!==undefined){
         const cr2=document.getElementById('cr2');
@@ -326,9 +327,12 @@ function upd(d){
     // Metrics
     if(d.rt!==undefined)document.getElementById('ratio').textContent=d.rt.toFixed(2)+'x';
     if(d.uo!==undefined&&d.un!==undefined)document.getElementById('uv').textContent=d.uo+'→'+d.un;
-    if(d.td!==undefined)document.getElementById('temp').textContent='Δ'+d.td+'°C';
+    if(d.tp!==undefined)document.getElementById('temp').textContent=d.tp+'°C';
+    if(d.td!==undefined){
+        const el=document.getElementById('tempDev');
+        el.textContent=(d.td>=0?'+':'')+d.td.toFixed(1)+'°C';
+        el.style.color=d.td>1.5?'#ff5252':'#69f0ae';
 }
-
 function genReport(){
     const now=new Date();
     const status=document.getElementById('status').textContent;
